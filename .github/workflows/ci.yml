@@ -41,11 +41,12 @@ jobs:
       - name: Verify pandoc works
         run: |
           node -e "
-            import { md2html } from './dist/index.js'
-            const pandoc = require('./dist/index.js');
-            md2html('# Hello World')
+            import('./dist/index.js')
+              .then(pandoc => {
+                return pandoc.default.convert('# Hello World', 'markdown', 'html');
+              })
               .then(result => {
-                console.log('Conversion successful:', result);
+                console.log('Conversion successful:', result.slice(0, 50) + '...');
                 process.exit(0);
               })
               .catch(err => {

@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18, 20, 21]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Install pandoc binary
+        run: npm run install-pandoc
+
+      - name: Run tests
+        run: npm test
+
+      - name: Verify pandoc works
+        run: |
+          node -e "
+            const pandoc = require('./dist/index.js');
+            pandoc.convert('# Hello World', 'markdown', 'html')
+              .then(result => {
+                console.log('Conversion successful:', result.slice(0, 50) + '...');
+                process.exit(0);
+              })
+              .catch(err => {
+                console.error('Conversion failed:', err);
+                process.exit(1);
+              });
+          "
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check TypeScript compilation
+        run: npx tsc --noEmit
+
+      - name: Check package can be packed
+        run: npm pack --dry-run

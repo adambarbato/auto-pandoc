@@ -1,34 +1,32 @@
 #!/usr/bin/env node
 
-// Check if dependencies are available before importing
-function checkDependencies() {
-  try {
-    require("tar");
-    require("yauzl");
-    return true;
-  } catch (error) {
-    console.log(
-      "Dependencies not yet installed. Skipping pandoc installation.",
-    );
-    console.log(
-      "Run 'npm run install-pandoc' to install pandoc binary after dependencies are available.",
-    );
-    return false;
-  }
-}
-
-// Only proceed if dependencies are available
-if (!checkDependencies()) {
-  process.exit(0);
-}
-
 import { promises as fs, createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
 import { createGunzip } from "zlib";
-import tar from "tar";
+
+// Dynamic import dependencies to handle different installation contexts
+let tar, yauzl;
+
+async function loadDependencies() {
+  try {
+    // Try to import dependencies dynamically
+    tar = await import("tar");
+
+    // yauzl will be imported when needed in extractArchive
+    return true;
+  } catch (error) {
+    console.log("Installing pandoc binary...");
+    console.log(
+      "Note: Using built-in extraction methods due to missing optional dependencies.",
+    );
+    return false;
+  }
+}
+
+const hasDependencies = await loadDependencies();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -250,102 +248,165 @@ async function downloadFile(url, outputPath) {
 }
 
 /**
- * Extract archive
+ * Extract archive with fallback methods
  */
 async function extractArchive(archivePath, extractDir, systemInfo) {
   console.log("Extracting archive...");
 
   if (systemInfo.extension === ".tar.gz") {
-    // Extract tar.gz
-    await tar.extract({
-      file: archivePath,
-      cwd: extractDir,
-      strip: 1, // Remove the top-level directory
-    });
-  } else if (systemInfo.extension === ".zip") {
-    // Extract ZIP file using yauzl library
-    const yauzl = await import("yauzl");
-
-    await new Promise((resolve, reject) => {
-      yauzl.default.open(archivePath, { lazyEntries: true }, (err, zipfile) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        let pendingExtractions = 0;
-        let entriesProcessed = 0;
-
-        const checkCompletion = () => {
-          if (pendingExtractions === 0 && entriesProcessed > 0) {
-            resolve();
-          }
-        };
-
-        zipfile.on("entry", (entry) => {
-          entriesProcessed++;
-
-          if (/\/$/.test(entry.fileName)) {
-            // Directory entry - create directory
-            const dirPath = join(extractDir, entry.fileName);
-            fs.mkdir(dirPath, { recursive: true })
-              .then(() => {
-                zipfile.readEntry();
-              })
-              .catch(reject);
-          } else {
-            // File entry - extract file
-            pendingExtractions++;
-
-            zipfile.openReadStream(entry, (err, readStream) => {
-              if (err) {
-                reject(err);
-                return;
-              }
-
-              const filePath = join(extractDir, entry.fileName);
-              const fileDir = dirname(filePath);
-
-              // Ensure directory exists
-              fs.mkdir(fileDir, { recursive: true })
-                .then(() => {
-                  const writeStream = createWriteStream(filePath);
-
-                  readStream.pipe(writeStream);
-
-                  writeStream.on("close", () => {
-                    pendingExtractions--;
-                    checkCompletion();
-                    zipfile.readEntry();
-                  });
-
-                  writeStream.on("error", reject);
-                })
-                .catch(reject);
-            });
-          }
-        });
-
-        zipfile.on("end", () => {
-          if (entriesProcessed === 0) {
-            resolve();
-          } else {
-            checkCompletion();
-          }
-        });
-
-        zipfile.on("error", reject);
-        zipfile.readEntry();
+    // Try using tar library if available, otherwise use native methods
+    if (hasDependencies && tar) {
+      await tar.default.extract({
+        file: archivePath,
+        cwd: extractDir,
+        strip: 1, // Remove the top-level directory
       });
-    });
-  } else if (systemInfo.extension === ".pkg") {
-    // For macOS PKG, we'd need to use system installer
-    throw new Error(
-      "PKG installation not implemented yet. Please install pandoc manually for macOS.",
-    );
+    } else {
+      // Fallback: use command line tar if available
+      await extractTarWithCommand(archivePath, extractDir);
+    }
+  } else if (systemInfo.extension === ".zip") {
+    // Try using yauzl library if available
+    if (hasDependencies) {
+      const yauzl = await import("yauzl");
+      await extractZipWithYauzl(archivePath, extractDir, yauzl);
+    } else {
+      // Fallback: use command line unzip if available
+      await extractZipWithCommand(archivePath, extractDir);
+    }
+  } else {
+    throw new Error(`Unsupported archive format: ${systemInfo.extension}`);
   }
 
   console.log("✓ Extraction completed");
+}
+
+/**
+ * Extract tar.gz using command line tar
+ */
+async function extractTarWithCommand(archivePath, extractDir) {
+  return new Promise((resolve, reject) => {
+    const tar = spawn(
+      "tar",
+      ["-xzf", archivePath, "-C", extractDir, "--strip-components=1"],
+      {
+        stdio: "inherit",
+      },
+    );
+
+    tar.on("close", (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`tar extraction failed with code ${code}`));
+      }
+    });
+
+    tar.on("error", (error) => {
+      reject(new Error(`tar command failed: ${error.message}`));
+    });
+  });
+}
+
+/**
+ * Extract ZIP using command line unzip
+ */
+async function extractZipWithCommand(archivePath, extractDir) {
+  return new Promise((resolve, reject) => {
+    const unzip = spawn("unzip", ["-q", archivePath, "-d", extractDir], {
+      stdio: "inherit",
+    });
+
+    unzip.on("close", (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`unzip extraction failed with code ${code}`));
+      }
+    });
+
+    unzip.on("error", (error) => {
+      reject(new Error(`unzip command failed: ${error.message}`));
+    });
+  });
+}
+
+/**
+ * Extract ZIP using yauzl library
+ */
+async function extractZipWithYauzl(archivePath, extractDir, yauzl) {
+  return new Promise((resolve, reject) => {
+    yauzl.default.open(archivePath, { lazyEntries: true }, (err, zipfile) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      let pendingExtractions = 0;
+      let entriesProcessed = 0;
+
+      const checkCompletion = () => {
+        if (pendingExtractions === 0 && entriesProcessed > 0) {
+          resolve();
+        }
+      };
+
+      zipfile.on("entry", (entry) => {
+        entriesProcessed++;
+
+        if (/\/$/.test(entry.fileName)) {
+          // Directory entry - create directory
+          const dirPath = join(extractDir, entry.fileName);
+          fs.mkdir(dirPath, { recursive: true })
+            .then(() => {
+              zipfile.readEntry();
+            })
+            .catch(reject);
+        } else {
+          // File entry - extract file
+          pendingExtractions++;
+
+          zipfile.openReadStream(entry, (err, readStream) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+
+            const filePath = join(extractDir, entry.fileName);
+            const fileDir = dirname(filePath);
+
+            // Ensure directory exists
+            fs.mkdir(fileDir, { recursive: true })
+              .then(() => {
+                const writeStream = createWriteStream(filePath);
+
+                readStream.pipe(writeStream);
+
+                writeStream.on("close", () => {
+                  pendingExtractions--;
+                  checkCompletion();
+                  zipfile.readEntry();
+                });
+
+                writeStream.on("error", reject);
+              })
+              .catch(reject);
+          });
+        }
+      });
+
+      zipfile.on("end", () => {
+        if (entriesProcessed === 0) {
+          resolve();
+        } else {
+          checkCompletion();
+        }
+      });
+
+      zipfile.on("error", reject);
+      zipfile.readEntry();
+    });
+  });
 }
 
 /**

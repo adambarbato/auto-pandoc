@@ -8,7 +8,7 @@ A TypeScript wrapper for [Pandoc](https://pandoc.org/) with automatic binary ins
 
 ## Features
 
-- 🚀 **Automatic Installation**: Pandoc binary is automatically downloaded and installed (Linux, macOS, Windows)
+- 🚀 **Automatic Installation**: Pandoc binary is automatically downloaded on first use (Linux, macOS, Windows)
 - 📝 **TypeScript Support**: Full TypeScript definitions and IntelliSense support
 - 🔄 **Format Conversion**: Convert between 40+ document formats
 - 🎯 **Type Safety**: Strongly typed options and return values
@@ -23,7 +23,34 @@ A TypeScript wrapper for [Pandoc](https://pandoc.org/) with automatic binary ins
 npm install pandoc-ts
 ```
 
-The Pandoc binary will be automatically downloaded and installed during the npm install process.
+The Pandoc binary will be automatically downloaded and installed when you first use the package.
+
+## Pandoc Binary Installation
+
+This package automatically manages the Pandoc binary installation:
+
+✅ **Automatic Installation**: The Pandoc binary downloads automatically when you first use any conversion function
+✅ **Global Installation**: Works with both local and global npm installations  
+✅ **Cross-platform**: Automatically selects the correct binary for your platform
+✅ **Lightweight**: Package is only ~125KB - binary downloads separately as needed
+
+```javascript
+const pandoc = require('pandoc-ts');
+// Binary downloads automatically on first conversion (if not already installed)
+const result = await pandoc.markdownToHtml('# Hello World');
+```
+
+### Manual Installation (Optional)
+You can also install the binary manually if desired:
+
+```bash
+# For local installations
+cd node_modules/pandoc-ts && npm run install-pandoc
+
+# For global installations - binary installs automatically on first use
+npm install -g pandoc-ts
+pandoc-ts --help
+```
 
 ## Quick Start
 
@@ -33,6 +60,7 @@ The Pandoc binary will be automatically downloaded and installed during the npm 
 import { Pandoc, markdownToHtml } from 'pandoc-ts';
 
 // Simple markdown to HTML conversion
+// Note: Pandoc binary downloads automatically on first use
 const result = await markdownToHtml('# Hello World\n\nThis is **bold** text.');
 console.log(result.output); // <h1>Hello World</h1><p>This is <strong>bold</strong> text.</p>
 
@@ -220,11 +248,11 @@ pandoc-ts input.md -t html -s --toc --css=styles.css -o output.html
 
 ## Platform Support
 
-- ✅ **Linux** (x86_64, ARM64, i386) - Automatic installation
-- ✅ **macOS** (x86_64, ARM64) - Automatic installation
-- ✅ **Windows** (x86_64, i386) - Automatic installation
+- ✅ **Linux** (x86_64, ARM64, i386) - Automatic binary download
+- ✅ **macOS** (x86_64, ARM64) - Automatic binary download  
+- ✅ **Windows** (x86_64, i386) - Automatic binary download
 
-The appropriate Pandoc binary is automatically downloaded and installed for your platform during installation.
+The appropriate Pandoc binary is automatically downloaded and installed for your platform on first use.
 
 ### `PandocOptions` Interface
 
@@ -378,9 +406,152 @@ try {
 - Node.js 18.0.0 or higher
 - TypeScript 5.0.0 or higher (peer dependency)
 
+## Development
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/adambarbato/pandoc-ts.git
+cd pandoc-ts
+
+# Install dependencies
+npm install
+
+# Build TypeScript
+npm run build
+
+# Run tests
+npm test
+
+# Pandoc binary installs automatically on first use
+# Or install manually if desired: npm run install-pandoc
+```
+
+### Development Scripts
+
+- `npm run build` - Compile TypeScript to JavaScript (production build)
+- `npm run dev` - Watch mode for development
+- `npm test` - Run full test suite (compile + test)
+- `npm run install-pandoc` - Install Pandoc binary manually (optional - happens automatically on first use)
+
+### Project Structure
+
+```
+pandoc-ts/
+├── src/                 # TypeScript source files
+│   ├── index.ts        # Main exports
+│   ├── pandoc.ts       # Core Pandoc wrapper
+│   ├── types.ts        # TypeScript definitions
+│   ├── utils.ts        # Utility functions
+│   └── test.ts         # Test files
+├── scripts/            # Installation scripts
+│   └── install-pandoc.js
+├── bin/                # CLI executable
+│   └── pandoc-ts.js
+└── dist/               # Compiled JavaScript (generated)
+```
+
+## Publishing to NPM
+
+This package uses automated publishing via GitHub Actions.
+
+### Automated Publishing
+
+The package is automatically published to NPM when you create a new version tag:
+
+```bash
+# Bump version and create tag
+npm version patch  # or minor, major
+git push origin main --tags
+```
+
+This triggers a GitHub Actions workflow that:
+- Runs tests on multiple Node.js versions (18, 20, 21)
+- Tests on multiple operating systems (Ubuntu, Windows, macOS)
+- Builds the TypeScript code
+- Publishes to NPM
+- Creates a GitHub release
+
+### Manual Publishing
+
+For manual publishing or first-time setup:
+
+1. **Setup NPM account and token:**
+   ```bash
+   npm login
+   npm whoami  # verify login
+   ```
+
+2. **Build and test:**
+   ```bash
+   npm run build
+   npm test  # pandoc binary installs automatically during tests
+   npm pack --dry-run  # preview package contents
+   ```
+
+3. **Publish:**
+   ```bash
+   npm publish
+   ```
+
+### GitHub Actions Setup
+
+The repository includes two workflows:
+
+- **CI** (`.github/workflows/ci.yml`) - Runs on every push and PR
+  - Tests on Node.js 18, 20, 21
+  - Tests on Ubuntu, Windows, macOS
+  - Installs Pandoc binary and runs full test suite
+- **Publish** (`.github/workflows/publish.yml`) - Publishes on version tags
+  - Runs tests before publishing
+  - Publishes to NPM automatically
+  - Creates GitHub releases
+
+To set up automated publishing:
+
+1. Create an NPM automation token at [npmjs.com](https://npmjs.com/settings/tokens)
+2. Add it as a repository secret named `NPM_TOKEN`
+3. The workflow will automatically publish when you push version tags
+
+### Package Contents
+
+The published package includes:
+- `dist/` - Compiled JavaScript and type definitions
+- `bin/pandoc-ts.js` - CLI executable (only the script, not the binary)
+- `scripts/` - Installation scripts for downloading Pandoc
+- `package.json`, `README.md`, `LICENSE`
+
+**Important**: The Pandoc binary (`bin/pandoc`) is **NOT** included in the npm package to keep it lightweight (~120 KB vs ~190 MB). The binary is automatically downloaded on first use or when manually running the install script.
+
+Excluded from package:
+- `src/` - TypeScript source files
+- `bin/pandoc` - Pandoc binary (downloaded automatically)
+- Development files (tsconfig, .github, examples)
+- Test files
+- Node modules and build artifacts
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Contributing Guidelines
+
+1. **Fork the repository** and create a feature branch
+2. **Make your changes** with appropriate tests
+3. **Run the test suite** to ensure everything works
+4. **Update documentation** if needed
+5. **Submit a pull request** with a clear description
+
+### Reporting Issues
+
+When reporting bugs, please include:
+- Node.js version
+- Operating system  
+- pandoc-ts version
+- Whether Pandoc binary was successfully installed (`pandoc --version`)
+- Minimal code example
+- Error messages and stack traces
 
 ## License
 
@@ -400,3 +571,5 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 - CLI tool
 - Comprehensive API with convenience functions
 - Support for all major platforms
+- GitHub Actions CI/CD pipeline
+- Automated NPM publishing

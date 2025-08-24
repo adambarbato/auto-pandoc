@@ -1,14 +1,24 @@
 #!/usr/bin/env node
 
 // Check if dependencies are available before importing
-try {
-  await import("tar");
-  await import("yauzl");
-} catch (error) {
-  console.log("Dependencies not yet installed. Skipping pandoc installation.");
-  console.log(
-    "Run 'npm install' to install pandoc binary after dependencies are available.",
-  );
+function checkDependencies() {
+  try {
+    require("tar");
+    require("yauzl");
+    return true;
+  } catch (error) {
+    console.log(
+      "Dependencies not yet installed. Skipping pandoc installation.",
+    );
+    console.log(
+      "Run 'npm run install-pandoc' to install pandoc binary after dependencies are available.",
+    );
+    return false;
+  }
+}
+
+// Only proceed if dependencies are available
+if (!checkDependencies()) {
   process.exit(0);
 }
 

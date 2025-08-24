@@ -26,7 +26,6 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.prod.json",
-    "postinstall": "node scripts/install-pandoc.js",
     "install-pandoc": "node scripts/install-pandoc.js",
     "test": "tsc && node --test dist/test.js",
     "dev": "tsc --watch"

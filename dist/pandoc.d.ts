@@ -53,6 +53,10 @@ export declare class Pandoc {
      * Parse warnings from pandoc output
      */
     private static parseWarnings;
+    /**
+     * Install pandoc binary automatically
+     */
+    private static installPandocBinary;
 }
 export default Pandoc;
 //# sourceMappingURL=pandoc.d.ts.map

@@ -54,8 +54,39 @@ export class Pandoc {
       }
     }
 
+    // Try to install pandoc automatically on first use
+    console.log(
+      "Pandoc binary not found. Attempting automatic installation...",
+    );
+    try {
+      await this.installPandocBinary();
+      // Try to find the binary again after installation
+      for (const path of possiblePaths) {
+        try {
+          const result = await this.execPandoc(
+            ["--version"],
+            { timeout: 5000 },
+            path,
+          );
+          if (result.success) {
+            this._binaryPath = path;
+            return path;
+          }
+        } catch {
+          continue;
+        }
+      }
+    } catch (installError) {
+      console.error(
+        "Automatic installation failed:",
+        installError instanceof Error
+          ? installError.message
+          : String(installError),
+      );
+    }
+
     throw new Error(
-      "Pandoc binary not found. Please ensure pandoc is installed or run npm install again.",
+      "Pandoc binary not found. Please run 'npm run install-pandoc' to install the binary manually.",
     );
   }
 
@@ -523,6 +554,42 @@ export class Pandoc {
     }
 
     return warnings;
+  }
+
+  /**
+   * Install pandoc binary automatically
+   */
+  private static async installPandocBinary(): Promise<void> {
+    try {
+      // Dynamic import of the install script
+      const { default: installPandoc } = await import(
+        "../scripts/install-pandoc.js"
+      );
+      await installPandoc();
+    } catch (error) {
+      // If import fails, try to run the script directly
+      const { spawn } = await import("child_process");
+      const { fileURLToPath } = await import("url");
+      const { dirname, join } = await import("path");
+
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = dirname(__filename);
+      const scriptPath = join(__dirname, "..", "scripts", "install-pandoc.js");
+
+      return new Promise((resolve, reject) => {
+        const child = spawn("node", [scriptPath], { stdio: "inherit" });
+
+        child.on("close", (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(new Error(`Installation script failed with code ${code}`));
+          }
+        });
+
+        child.on("error", reject);
+      });
+    }
   }
 }
 

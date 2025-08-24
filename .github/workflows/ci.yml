@@ -32,6 +32,8 @@ jobs:
 
       - name: Install pandoc binary
         run: npm run install-pandoc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
         run: npm test
@@ -50,6 +52,8 @@ jobs:
                 process.exit(1);
               });
           "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
     runs-on: ubuntu-latest

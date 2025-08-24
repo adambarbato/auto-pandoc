@@ -130,10 +130,17 @@ async function getLatestRelease() {
   console.log("Fetching latest pandoc release information...");
 
   try {
+    const headers = {
+      "User-Agent": "pandoc-ts-installer",
+    };
+
+    // Use GitHub token if available to avoid rate limiting
+    if (process.env.GITHUB_TOKEN) {
+      headers["Authorization"] = `token ${process.env.GITHUB_TOKEN}`;
+    }
+
     const response = await fetch(PANDOC_RELEASES_URL, {
-      headers: {
-        "User-Agent": "pandoc-ts-installer",
-      },
+      headers,
     });
 
     if (!response.ok) {

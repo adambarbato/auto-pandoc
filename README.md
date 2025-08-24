@@ -1,5 +1,9 @@
 # pandoc-ts
 
+```bash
+WARNING: code mostly written by Claude to use as a personal dependency so some features may be broken. Contributions are open if you find an issue.
+```
+
 A TypeScript wrapper for [Pandoc](https://pandoc.org/) with automatic binary installation. This package provides a complete TypeScript interface to Pandoc's document conversion capabilities, automatically downloading and installing the Pandoc binary when you install the package.
 
 ## Features
@@ -217,7 +221,7 @@ pandoc-ts input.md -t html -s --toc --css=styles.css -o output.html
 ## Platform Support
 
 - ✅ **Linux** (x86_64, ARM64, i386) - Automatic installation
-- ✅ **macOS** (x86_64, ARM64) - Automatic installation  
+- ✅ **macOS** (x86_64, ARM64) - Automatic installation
 - ✅ **Windows** (x86_64, i386) - Automatic installation
 
 The appropriate Pandoc binary is automatically downloaded and installed for your platform during installation.
@@ -347,10 +351,10 @@ import { Pandoc } from 'pandoc-ts';
 
 try {
   const result = await Pandoc.convert(input, options);
-  
+
   if (result.success) {
     console.log('Success:', result.output);
-    
+
     // Check for warnings
     if (result.warnings && result.warnings.length > 0) {
       console.warn('Warnings:', result.warnings);
@@ -360,7 +364,7 @@ try {
   }
 } catch (error) {
   console.error('Error:', error.message);
-  
+
   if (error.message.includes('not found')) {
     console.error('Pandoc binary not available. Please reinstall pandoc-ts.');
   }

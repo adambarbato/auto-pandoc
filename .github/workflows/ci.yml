@@ -40,9 +40,9 @@ jobs:
         run: |
           node -e "
             const pandoc = require('./dist/index.js');
-            pandoc.convert('# Hello World', 'markdown', 'html')
+            pandoc.md2html('# Hello World')
               .then(result => {
-                console.log('Conversion successful:', result.slice(0, 50) + '...');
+                console.log('Conversion successful:', result);
                 process.exit(0);
               })
               .catch(err => {

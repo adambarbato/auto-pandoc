@@ -164,12 +164,18 @@ async function getLatestRelease() {
 function findDownloadAsset(assets, systemInfo) {
   const { os, architecture, extension } = systemInfo;
 
+  // Use platform-specific architecture names
+  let downloadArchitecture = architecture;
+  if (systemInfo.platform === "linux" && architecture === "x86_64") {
+    downloadArchitecture = "amd64";
+  }
+
   // Try to find the best match
   let asset = assets.find((asset) => {
     const name = asset.name.toLowerCase();
     return (
       name.includes(os.toLowerCase()) &&
-      name.includes(architecture) &&
+      name.includes(downloadArchitecture) &&
       name.endsWith(extension)
     );
   });
@@ -177,10 +183,10 @@ function findDownloadAsset(assets, systemInfo) {
   // Fallback patterns for different naming conventions
   if (!asset) {
     const patterns = [
-      `pandoc-.*-${os}-${architecture}${extension}`,
-      `pandoc-.*-${architecture}-${os}${extension}`,
-      `pandoc-.*${os}.*${architecture}${extension}`,
-      `pandoc-.*${architecture}.*${os}${extension}`,
+      `pandoc-.*-${os}-${downloadArchitecture}${extension}`,
+      `pandoc-.*-${downloadArchitecture}-${os}${extension}`,
+      `pandoc-.*${os}.*${downloadArchitecture}${extension}`,
+      `pandoc-.*${downloadArchitecture}.*${os}${extension}`,
     ];
 
     for (const pattern of patterns) {

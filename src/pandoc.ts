@@ -1,15 +1,15 @@
-import { spawn, SpawnOptions } from 'child_process';
-import { promises as fs } from 'fs';
-import { join, resolve } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { spawn, SpawnOptions } from "child_process";
+import { promises as fs } from "fs";
+import { join, resolve } from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import type {
   PandocOptions,
   PandocResult,
   PandocBinary,
   ExecOptions,
-  PandocFormat
-} from './types.js';
+  PandocFormat,
+} from "./types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -32,15 +32,19 @@ export class Pandoc {
     // Try different possible locations
     const possiblePaths = [
       // Local installation in node_modules
-      join(__dirname, '..', '..', 'bin', 'pandoc'),
-      join(__dirname, '..', '..', 'bin', 'pandoc.exe'),
+      join(__dirname, "..", "bin", "pandoc"),
+      join(__dirname, "..", "bin", "pandoc.exe"),
       // System installation
-      'pandoc'
+      "pandoc",
     ];
 
     for (const path of possiblePaths) {
       try {
-        const result = await this.execPandoc(['--version'], { timeout: 5000 }, path);
+        const result = await this.execPandoc(
+          ["--version"],
+          { timeout: 5000 },
+          path,
+        );
         if (result.success) {
           this._binaryPath = path;
           return path;
@@ -50,7 +54,9 @@ export class Pandoc {
       }
     }
 
-    throw new Error('Pandoc binary not found. Please ensure pandoc is installed or run npm install again.');
+    throw new Error(
+      "Pandoc binary not found. Please ensure pandoc is installed or run npm install again.",
+    );
   }
 
   /**
@@ -62,14 +68,14 @@ export class Pandoc {
     }
 
     const binaryPath = await this.getBinaryPath();
-    const result = await this.execPandoc(['--version'], {}, binaryPath);
+    const result = await this.execPandoc(["--version"], {}, binaryPath);
 
     if (!result.success || !result.output) {
-      throw new Error('Failed to get pandoc version');
+      throw new Error("Failed to get pandoc version");
     }
 
     const versionMatch = result.output.match(/pandoc (\d+\.\d+(?:\.\d+)?)/);
-    this._version = versionMatch ? versionMatch[1] : 'unknown';
+    this._version = versionMatch ? versionMatch[1] : "unknown";
     return this._version;
   }
 
@@ -83,13 +89,13 @@ export class Pandoc {
       return {
         path,
         version,
-        available: true
+        available: true,
       };
     } catch (error) {
       return {
-        path: '',
-        version: '',
-        available: false
+        path: "",
+        version: "",
+        available: false,
       };
     }
   }
@@ -97,29 +103,36 @@ export class Pandoc {
   /**
    * Convert content using pandoc
    */
-  static async convert(input: string, options: PandocOptions = {}): Promise<PandocResult> {
+  static async convert(
+    input: string,
+    options: PandocOptions = {},
+  ): Promise<PandocResult> {
     const binaryPath = await this.getBinaryPath();
     const args = this.buildArgs(options);
 
     try {
-      const result = await this.execPandoc(args, {
-        input,
-        timeout: options.verbose ? 60000 : 30000
-      }, binaryPath);
+      const result = await this.execPandoc(
+        args,
+        {
+          input,
+          timeout: options.verbose ? 60000 : 30000,
+        },
+        binaryPath,
+      );
 
       return {
         output: result.output,
         outputPath: options.output,
         success: result.success,
         error: result.error,
-        warnings: this.parseWarnings(result.output || ''),
-        version: await this.getVersion()
+        warnings: this.parseWarnings(result.output || ""),
+        version: await this.getVersion(),
       };
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
-        version: await this.getVersion()
+        version: await this.getVersion(),
       };
     }
   }
@@ -127,7 +140,11 @@ export class Pandoc {
   /**
    * Convert a file using pandoc
    */
-  static async convertFile(inputPath: string, outputPath?: string, options: PandocOptions = {}): Promise<PandocResult> {
+  static async convertFile(
+    inputPath: string,
+    outputPath?: string,
+    options: PandocOptions = {},
+  ): Promise<PandocResult> {
     const binaryPath = await this.getBinaryPath();
     const resolvedInputPath = resolve(inputPath);
 
@@ -138,30 +155,37 @@ export class Pandoc {
       return {
         success: false,
         error: `Input file not found: ${resolvedInputPath}`,
-        version: await this.getVersion()
+        version: await this.getVersion(),
       };
     }
 
-    const args = [resolvedInputPath, ...this.buildArgs({ ...options, output: outputPath })];
+    const args = [
+      resolvedInputPath,
+      ...this.buildArgs({ ...options, output: outputPath }),
+    ];
 
     try {
-      const result = await this.execPandoc(args, {
-        timeout: options.verbose ? 60000 : 30000
-      }, binaryPath);
+      const result = await this.execPandoc(
+        args,
+        {
+          timeout: options.verbose ? 60000 : 30000,
+        },
+        binaryPath,
+      );
 
       return {
         output: outputPath ? undefined : result.output,
         outputPath,
         success: result.success,
         error: result.error,
-        warnings: this.parseWarnings(result.output || ''),
-        version: await this.getVersion()
+        warnings: this.parseWarnings(result.output || ""),
+        version: await this.getVersion(),
       };
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
-        version: await this.getVersion()
+        version: await this.getVersion(),
       };
     }
   }
@@ -171,13 +195,20 @@ export class Pandoc {
    */
   static async listInputFormats(): Promise<PandocFormat[]> {
     const binaryPath = await this.getBinaryPath();
-    const result = await this.execPandoc(['--list-input-formats'], {}, binaryPath);
+    const result = await this.execPandoc(
+      ["--list-input-formats"],
+      {},
+      binaryPath,
+    );
 
     if (!result.success || !result.output) {
-      throw new Error('Failed to list input formats');
+      throw new Error("Failed to list input formats");
     }
 
-    return result.output.trim().split('\n').map(format => format.trim()) as PandocFormat[];
+    return result.output
+      .trim()
+      .split("\n")
+      .map((format) => format.trim()) as PandocFormat[];
   }
 
   /**
@@ -185,13 +216,20 @@ export class Pandoc {
    */
   static async listOutputFormats(): Promise<PandocFormat[]> {
     const binaryPath = await this.getBinaryPath();
-    const result = await this.execPandoc(['--list-output-formats'], {}, binaryPath);
+    const result = await this.execPandoc(
+      ["--list-output-formats"],
+      {},
+      binaryPath,
+    );
 
     if (!result.success || !result.output) {
-      throw new Error('Failed to list output formats');
+      throw new Error("Failed to list output formats");
     }
 
-    return result.output.trim().split('\n').map(format => format.trim()) as PandocFormat[];
+    return result.output
+      .trim()
+      .split("\n")
+      .map((format) => format.trim()) as PandocFormat[];
   }
 
   /**
@@ -199,13 +237,20 @@ export class Pandoc {
    */
   static async listHighlightStyles(): Promise<string[]> {
     const binaryPath = await this.getBinaryPath();
-    const result = await this.execPandoc(['--list-highlight-styles'], {}, binaryPath);
+    const result = await this.execPandoc(
+      ["--list-highlight-styles"],
+      {},
+      binaryPath,
+    );
 
     if (!result.success || !result.output) {
-      throw new Error('Failed to list highlight styles');
+      throw new Error("Failed to list highlight styles");
     }
 
-    return result.output.trim().split('\n').map(style => style.trim());
+    return result.output
+      .trim()
+      .split("\n")
+      .map((style) => style.trim());
   }
 
   /**
@@ -213,7 +258,11 @@ export class Pandoc {
    */
   static async getDefaultTemplate(format: PandocFormat): Promise<string> {
     const binaryPath = await this.getBinaryPath();
-    const result = await this.execPandoc(['--print-default-template', format], {}, binaryPath);
+    const result = await this.execPandoc(
+      ["--print-default-template", format],
+      {},
+      binaryPath,
+    );
 
     if (!result.success || !result.output) {
       throw new Error(`Failed to get default template for format: ${format}`);
@@ -228,57 +277,59 @@ export class Pandoc {
   private static async execPandoc(
     args: string[],
     options: ExecOptions = {},
-    binaryPath?: string
+    binaryPath?: string,
   ): Promise<{ success: boolean; output?: string; error?: string }> {
-    const pandocPath = binaryPath || await this.getBinaryPath();
+    const pandocPath = binaryPath || (await this.getBinaryPath());
 
     return new Promise((resolve, reject) => {
       const spawnOptions: SpawnOptions = {
         cwd: options.cwd,
         env: { ...process.env, ...options.env },
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ["pipe", "pipe", "pipe"],
       };
 
       const child = spawn(pandocPath, args, spawnOptions);
 
-      let stdout = '';
-      let stderr = '';
+      let stdout = "";
+      let stderr = "";
       let timeoutId: NodeJS.Timeout | undefined;
 
       if (options.timeout) {
         timeoutId = setTimeout(() => {
-          child.kill('SIGKILL');
-          reject(new Error(`Pandoc execution timed out after ${options.timeout}ms`));
+          child.kill("SIGKILL");
+          reject(
+            new Error(`Pandoc execution timed out after ${options.timeout}ms`),
+          );
         }, options.timeout);
       }
 
-      child.stdout?.on('data', (data) => {
-        stdout += data.toString(options.encoding || 'utf8');
+      child.stdout?.on("data", (data) => {
+        stdout += data.toString(options.encoding || "utf8");
       });
 
-      child.stderr?.on('data', (data) => {
-        stderr += data.toString(options.encoding || 'utf8');
+      child.stderr?.on("data", (data) => {
+        stderr += data.toString(options.encoding || "utf8");
       });
 
-      child.on('error', (error) => {
+      child.on("error", (error) => {
         if (timeoutId) clearTimeout(timeoutId);
         reject(error);
       });
 
-      child.on('close', (code) => {
+      child.on("close", (code) => {
         if (timeoutId) clearTimeout(timeoutId);
 
         const success = code === 0;
         resolve({
           success,
           output: stdout || undefined,
-          error: stderr || undefined
+          error: stderr || undefined,
         });
       });
 
       // Send input if provided
       if (options.input && child.stdin) {
-        child.stdin.write(options.input, options.encoding || 'utf8');
+        child.stdin.write(options.input, options.encoding || "utf8");
         child.stdin.end();
       } else if (child.stdin) {
         child.stdin.end();
@@ -293,138 +344,161 @@ export class Pandoc {
     const args: string[] = [];
 
     // Input/Output formats
-    if (options.from) args.push('--from', options.from);
-    if (options.to) args.push('--to', options.to);
-    if (options.output) args.push('--output', options.output);
+    if (options.from) args.push("--from", options.from);
+    if (options.to) args.push("--to", options.to);
+    if (options.output) args.push("--output", options.output);
 
     // Document options
-    if (options.standalone) args.push('--standalone');
-    if (options.template) args.push('--template', options.template);
+    if (options.standalone) args.push("--standalone");
+    if (options.template) args.push("--template", options.template);
 
     // Variables and metadata
     if (options.variables) {
       Object.entries(options.variables).forEach(([key, value]) => {
-        args.push('--variable', `${key}=${value}`);
+        args.push("--variable", `${key}=${value}`);
       });
     }
     if (options.metadata) {
       Object.entries(options.metadata).forEach(([key, value]) => {
-        args.push('--metadata', `${key}=${JSON.stringify(value)}`);
+        args.push("--metadata", `${key}=${JSON.stringify(value)}`);
       });
     }
 
     // Includes
     if (options.css) {
       const cssFiles = Array.isArray(options.css) ? options.css : [options.css];
-      cssFiles.forEach(css => args.push('--css', css));
+      cssFiles.forEach((css) => args.push("--css", css));
     }
     if (options.includeInHeader) {
-      const files = Array.isArray(options.includeInHeader) ? options.includeInHeader : [options.includeInHeader];
-      files.forEach(file => args.push('--include-in-header', file));
+      const files = Array.isArray(options.includeInHeader)
+        ? options.includeInHeader
+        : [options.includeInHeader];
+      files.forEach((file) => args.push("--include-in-header", file));
     }
     if (options.includeBeforeBody) {
-      const files = Array.isArray(options.includeBeforeBody) ? options.includeBeforeBody : [options.includeBeforeBody];
-      files.forEach(file => args.push('--include-before-body', file));
+      const files = Array.isArray(options.includeBeforeBody)
+        ? options.includeBeforeBody
+        : [options.includeBeforeBody];
+      files.forEach((file) => args.push("--include-before-body", file));
     }
     if (options.includeAfterBody) {
-      const files = Array.isArray(options.includeAfterBody) ? options.includeAfterBody : [options.includeAfterBody];
-      files.forEach(file => args.push('--include-after-body', file));
+      const files = Array.isArray(options.includeAfterBody)
+        ? options.includeAfterBody
+        : [options.includeAfterBody];
+      files.forEach((file) => args.push("--include-after-body", file));
     }
 
     // Table of contents
-    if (options.toc) args.push('--toc');
-    if (options.tocDepth) args.push('--toc-depth', String(options.tocDepth));
+    if (options.toc) args.push("--toc");
+    if (options.tocDepth) args.push("--toc-depth", String(options.tocDepth));
 
     // Formatting
-    if (options.numberSections) args.push('--number-sections');
-    if (options.sectionDivs) args.push('--section-divs');
+    if (options.numberSections) args.push("--number-sections");
+    if (options.sectionDivs) args.push("--section-divs");
 
     // Math rendering
-    if (options.mathml) args.push('--mathml');
+    if (options.mathml) args.push("--mathml");
     if (options.mathjax) {
-      if (typeof options.mathjax === 'string') {
-        args.push('--mathjax', options.mathjax);
+      if (typeof options.mathjax === "string") {
+        args.push("--mathjax", options.mathjax);
       } else {
-        args.push('--mathjax');
+        args.push("--mathjax");
       }
     }
     if (options.katex) {
-      if (typeof options.katex === 'string') {
-        args.push('--katex', options.katex);
+      if (typeof options.katex === "string") {
+        args.push("--katex", options.katex);
       } else {
-        args.push('--katex');
+        args.push("--katex");
       }
     }
 
     // Syntax highlighting
     if (options.highlightStyle === false) {
-      args.push('--no-highlight');
+      args.push("--no-highlight");
     } else if (options.highlightStyle) {
-      args.push('--highlight-style', options.highlightStyle);
+      args.push("--highlight-style", options.highlightStyle);
     }
 
     // Self-contained
-    if (options.selfContained) args.push('--self-contained');
+    if (options.selfContained) args.push("--self-contained");
 
     // Citations
     if (options.bibliography) {
-      const bibFiles = Array.isArray(options.bibliography) ? options.bibliography : [options.bibliography];
-      bibFiles.forEach(bib => args.push('--bibliography', bib));
+      const bibFiles = Array.isArray(options.bibliography)
+        ? options.bibliography
+        : [options.bibliography];
+      bibFiles.forEach((bib) => args.push("--bibliography", bib));
     }
-    if (options.csl) args.push('--csl', options.csl);
-    if (options.citationAbbreviations) args.push('--citation-abbreviations', options.citationAbbreviations);
+    if (options.csl) args.push("--csl", options.csl);
+    if (options.citationAbbreviations)
+      args.push("--citation-abbreviations", options.citationAbbreviations);
 
     // Filters
     if (options.filters) {
-      const filters = Array.isArray(options.filters) ? options.filters : [options.filters];
-      filters.forEach(filter => args.push('--filter', filter));
+      const filters = Array.isArray(options.filters)
+        ? options.filters
+        : [options.filters];
+      filters.forEach((filter) => args.push("--filter", filter));
     }
     if (options.luaFilters) {
-      const luaFilters = Array.isArray(options.luaFilters) ? options.luaFilters : [options.luaFilters];
-      luaFilters.forEach(filter => args.push('--lua-filter', filter));
+      const luaFilters = Array.isArray(options.luaFilters)
+        ? options.luaFilters
+        : [options.luaFilters];
+      luaFilters.forEach((filter) => args.push("--lua-filter", filter));
     }
 
     // Paths
-    if (options.dataDir) args.push('--data-dir', options.dataDir);
+    if (options.dataDir) args.push("--data-dir", options.dataDir);
     if (options.resourcePath) {
-      const paths = Array.isArray(options.resourcePath) ? options.resourcePath : [options.resourcePath];
-      args.push('--resource-path', paths.join(':'));
+      const paths = Array.isArray(options.resourcePath)
+        ? options.resourcePath
+        : [options.resourcePath];
+      args.push("--resource-path", paths.join(":"));
     }
 
     // PDF options
-    if (options.pdfEngine) args.push('--pdf-engine', options.pdfEngine);
+    if (options.pdfEngine) args.push("--pdf-engine", options.pdfEngine);
     if (options.pdfEngineOpts) {
-      const opts = Array.isArray(options.pdfEngineOpts) ? options.pdfEngineOpts : [options.pdfEngineOpts];
-      opts.forEach(opt => args.push('--pdf-engine-opt', opt));
+      const opts = Array.isArray(options.pdfEngineOpts)
+        ? options.pdfEngineOpts
+        : [options.pdfEngineOpts];
+      opts.forEach((opt) => args.push("--pdf-engine-opt", opt));
     }
 
     // Reference options
-    if (options.referenceDoc) args.push('--reference-doc', options.referenceDoc);
-    if (options.referenceLinks) args.push('--reference-links');
-    if (options.referenceLocation) args.push('--reference-location', options.referenceLocation);
+    if (options.referenceDoc)
+      args.push("--reference-doc", options.referenceDoc);
+    if (options.referenceLinks) args.push("--reference-links");
+    if (options.referenceLocation)
+      args.push("--reference-location", options.referenceLocation);
 
     // Other options
-    if (options.failIfWarnings) args.push('--fail-if-warnings');
-    if (options.verbose) args.push('--verbose');
-    if (options.quiet) args.push('--quiet');
-    if (options.trace) args.push('--trace');
-    if (options.logFile) args.push('--log', options.logFile);
+    if (options.failIfWarnings) args.push("--fail-if-warnings");
+    if (options.verbose) args.push("--verbose");
+    if (options.quiet) args.push("--quiet");
+    if (options.trace) args.push("--trace");
+    if (options.logFile) args.push("--log", options.logFile);
 
     // List options
-    if (options.listInputFormats) args.push('--list-input-formats');
-    if (options.listOutputFormats) args.push('--list-output-formats');
-    if (options.listExtensions) args.push('--list-extensions', options.listExtensions);
-    if (options.listHighlightLanguages) args.push('--list-highlight-languages');
-    if (options.listHighlightStyles) args.push('--list-highlight-styles');
+    if (options.listInputFormats) args.push("--list-input-formats");
+    if (options.listOutputFormats) args.push("--list-output-formats");
+    if (options.listExtensions)
+      args.push("--list-extensions", options.listExtensions);
+    if (options.listHighlightLanguages) args.push("--list-highlight-languages");
+    if (options.listHighlightStyles) args.push("--list-highlight-styles");
 
     // Print options
-    if (options.printDefaultTemplate) args.push('--print-default-template', options.printDefaultTemplate);
-    if (options.printDefaultDataFile) args.push('--print-default-data-file', options.printDefaultDataFile);
-    if (options.printHighlightStyle) args.push('--print-highlight-style', options.printHighlightStyle);
+    if (options.printDefaultTemplate)
+      args.push("--print-default-template", options.printDefaultTemplate);
+    if (options.printDefaultDataFile)
+      args.push("--print-default-data-file", options.printDefaultDataFile);
+    if (options.printHighlightStyle)
+      args.push("--print-highlight-style", options.printHighlightStyle);
 
     // Help/version
-    if (options.version) args.push('--version');
-    if (options.help) args.push('--help');
+    if (options.version) args.push("--version");
+    if (options.help) args.push("--help");
 
     return args;
   }
@@ -434,10 +508,13 @@ export class Pandoc {
    */
   private static parseWarnings(output: string): string[] {
     const warnings: string[] = [];
-    const lines = output.split('\n');
+    const lines = output.split("\n");
 
     for (const line of lines) {
-      if (line.includes('[WARNING]') || line.toLowerCase().includes('warning:')) {
+      if (
+        line.includes("[WARNING]") ||
+        line.toLowerCase().includes("warning:")
+      ) {
         warnings.push(line.trim());
       }
     }

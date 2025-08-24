@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import { promises as fs } from "fs";
-import { createWriteStream } from "fs";
+import { promises as fs, createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -33,7 +32,7 @@ function getSystemInfo() {
       break;
     case "darwin":
       os = "macOS";
-      extension = ".pkg";
+      extension = ".zip";
       break;
     case "linux":
       os = "linux";
@@ -242,10 +241,81 @@ async function extractArchive(archivePath, extractDir, systemInfo) {
       strip: 1, // Remove the top-level directory
     });
   } else if (systemInfo.extension === ".zip") {
-    // For zip files, we'd need additional dependency or fallback to system unzip
-    throw new Error(
-      "ZIP extraction not implemented yet. Please install pandoc manually for Windows.",
-    );
+    // Extract ZIP file using yauzl library
+    const yauzl = await import("yauzl");
+
+    await new Promise((resolve, reject) => {
+      yauzl.default.open(archivePath, { lazyEntries: true }, (err, zipfile) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        let pendingExtractions = 0;
+        let entriesProcessed = 0;
+
+        const checkCompletion = () => {
+          if (pendingExtractions === 0 && entriesProcessed > 0) {
+            resolve();
+          }
+        };
+
+        zipfile.on("entry", (entry) => {
+          entriesProcessed++;
+
+          if (/\/$/.test(entry.fileName)) {
+            // Directory entry - create directory
+            const dirPath = join(extractDir, entry.fileName);
+            fs.mkdir(dirPath, { recursive: true })
+              .then(() => {
+                zipfile.readEntry();
+              })
+              .catch(reject);
+          } else {
+            // File entry - extract file
+            pendingExtractions++;
+
+            zipfile.openReadStream(entry, (err, readStream) => {
+              if (err) {
+                reject(err);
+                return;
+              }
+
+              const filePath = join(extractDir, entry.fileName);
+              const fileDir = dirname(filePath);
+
+              // Ensure directory exists
+              fs.mkdir(fileDir, { recursive: true })
+                .then(() => {
+                  const writeStream = createWriteStream(filePath);
+
+                  readStream.pipe(writeStream);
+
+                  writeStream.on("close", () => {
+                    pendingExtractions--;
+                    checkCompletion();
+                    zipfile.readEntry();
+                  });
+
+                  writeStream.on("error", reject);
+                })
+                .catch(reject);
+            });
+          }
+        });
+
+        zipfile.on("end", () => {
+          if (entriesProcessed === 0) {
+            resolve();
+          } else {
+            checkCompletion();
+          }
+        });
+
+        zipfile.on("error", reject);
+        zipfile.readEntry();
+      });
+    });
   } else if (systemInfo.extension === ".pkg") {
     // For macOS PKG, we'd need to use system installer
     throw new Error(
@@ -416,21 +486,6 @@ async function installPandoc() {
     // Get system information
     const systemInfo = getSystemInfo();
     console.log(`System: ${systemInfo.os} ${systemInfo.architecture}`);
-
-    // Special handling for macOS PKG files
-    if (systemInfo.os === "macOS" && systemInfo.extension === ".pkg") {
-      console.log(
-        "\n⚠️  Automatic installation not supported for macOS PKG files.",
-      );
-      console.log("Please install pandoc manually:");
-      console.log("1. Visit: https://pandoc.org/installing.html");
-      console.log("2. Download and install the macOS installer");
-      console.log("3. Or use Homebrew: brew install pandoc");
-      console.log(
-        "\nAfter installation, pandoc-ts will automatically detect and use your system installation.",
-      );
-      return;
-    }
 
     // Get latest release
     const release = await getLatestRelease();

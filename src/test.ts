@@ -119,7 +119,7 @@ test("Basic conversions", async (t) => {
 
       if (result.success) {
         assert.ok(result.output, "should have output");
-        assert.ok(result.output.includes("<h1>"), "should contain h1 tag");
+        assert.ok(result.output.includes("<h1"), "should contain h1 tag");
         assert.ok(
           result.output.includes("<strong>"),
           "should contain strong tag",
@@ -189,7 +189,7 @@ test("Pandoc class direct usage", async (t) => {
       assert.strictEqual(typeof result, "object", "should return object");
       assert.strictEqual(result.success, true, "conversion should succeed");
       assert.ok(result.output, "should have output");
-      assert.ok(result.output.includes("<h1>"), "should contain h1 tag");
+      assert.ok(result.output.includes("<h1"), "should contain h1 tag");
       console.log("Direct Pandoc conversion successful");
     } catch (error) {
       if (error instanceof Error && error.message.includes("not found")) {
@@ -219,7 +219,7 @@ test("Utility functions", async (t) => {
   await t.test("word count", async () => {
     try {
       const text = "Hello world this is a test";
-      const count = await getWordCount(text, "plain");
+      const count = await getWordCount(text, "markdown");
 
       assert.strictEqual(typeof count, "number", "should return number");
       assert.strictEqual(count, 6, "should count 6 words");

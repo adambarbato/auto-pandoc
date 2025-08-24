@@ -4,7 +4,7 @@ A TypeScript wrapper for [Pandoc](https://pandoc.org/) with automatic binary ins
 
 ## Features
 
-- 🚀 **Automatic Installation**: Pandoc binary is automatically downloaded and installed
+- 🚀 **Automatic Installation**: Pandoc binary is automatically downloaded and installed (Linux, macOS, Windows)
 - 📝 **TypeScript Support**: Full TypeScript definitions and IntelliSense support
 - 🔄 **Format Conversion**: Convert between 40+ document formats
 - 🎯 **Type Safety**: Strongly typed options and return values
@@ -214,6 +214,14 @@ pandoc-ts input.md -t html -s --toc --css=styles.css -o output.html
 
 ## Configuration Options
 
+## Platform Support
+
+- ✅ **Linux** (x86_64, ARM64, i386) - Automatic installation
+- ✅ **macOS** (x86_64, ARM64) - Automatic installation  
+- ✅ **Windows** (x86_64, i386) - Automatic installation
+
+The appropriate Pandoc binary is automatically downloaded and installed for your platform during installation.
+
 ### `PandocOptions` Interface
 
 ```typescript
@@ -359,13 +367,7 @@ try {
 }
 ```
 
-## Platform Support
 
-- ✅ **Linux** (x86_64, ARM64, i386)
-- ✅ **macOS** (x86_64, ARM64)
-- ✅ **Windows** (x86_64, i386)
-
-The appropriate Pandoc binary is automatically downloaded for your platform during installation.
 
 ## Requirements
 

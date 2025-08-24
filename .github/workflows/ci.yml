@@ -46,7 +46,7 @@ jobs:
                 return pandoc.default.convert('# Hello World', 'markdown', 'html');
               })
               .then(result => {
-                console.log('Conversion successful:', result.slice(0, 50) + '...');
+                console.log('Conversion successful:', result);
                 process.exit(0);
               })
               .catch(err => {

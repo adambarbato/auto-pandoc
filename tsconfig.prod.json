@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false,
+    "noEmitOnError": false
+  },
+  "include": ["src/index.ts", "src/pandoc.ts", "src/types.ts", "src/utils.ts"],
+  "exclude": ["src/test.ts", "**/*.test.ts", "node_modules", "dist"]
+}

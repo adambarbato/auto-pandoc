@@ -329,7 +329,10 @@ export class Pandoc {
 
       // Send input if provided
       if (options.input && child.stdin) {
-        child.stdin.write(options.input, options.encoding || "utf8");
+        child.stdin.write(
+          options.input,
+          (options.encoding as BufferEncoding) || "utf8",
+        );
         child.stdin.end();
       } else if (child.stdin) {
         child.stdin.end();

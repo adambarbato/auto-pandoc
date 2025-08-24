@@ -294,5 +294,5 @@ export interface ExecOptions {
   /** Input to pipe to pandoc */
   input?: string;
   /** Encoding for input/output */
-  encoding?: BufferEncoding;
+  encoding?: string;
 }

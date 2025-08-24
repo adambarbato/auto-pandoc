@@ -1,5 +1,17 @@
 #!/usr/bin/env node
 
+// Check if dependencies are available before importing
+try {
+  await import("tar");
+  await import("yauzl");
+} catch (error) {
+  console.log("Dependencies not yet installed. Skipping pandoc installation.");
+  console.log(
+    "Run 'npm install' to install pandoc binary after dependencies are available.",
+  );
+  process.exit(0);
+}
+
 import { promises as fs, createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { join, dirname } from "path";

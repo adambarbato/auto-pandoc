@@ -467,9 +467,9 @@ export class Pandoc {
      */
     static async installPandocBinary() {
         try {
-            // Dynamic import of the install script
-            const { default: installPandoc } = await import("../scripts/install-pandoc.js");
-            await installPandoc();
+            // Dynamic import of the install script with proper typing
+            const installModule = (await import("../scripts/install-pandoc.js"));
+            await installModule.default();
         }
         catch (error) {
             // If import fails, try to run the script directly

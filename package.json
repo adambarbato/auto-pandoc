@@ -1,0 +1,61 @@
+{
+  "name": "pandoc-ts",
+  "version": "1.0.0",
+  "description": "TypeScript wrapper for pandoc with automatic binary installation",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "bin",
+    "scripts"
+  ],
+  "bin": {
+    "pandoc-ts": "./bin/pandoc-ts.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "postinstall": "node scripts/install-pandoc.js",
+    "test": "node --test dist/test.js",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "pandoc",
+    "typescript",
+    "markdown",
+    "conversion",
+    "document"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/pandoc-ts.git"
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.3",
+    "node-fetch": "^3.3.2",
+    "tar": "^6.2.0",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^20.11.0",
+    "@types/tar": "^6.1.11",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

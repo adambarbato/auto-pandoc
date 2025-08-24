@@ -41,8 +41,9 @@ jobs:
       - name: Verify pandoc works
         run: |
           node -e "
+            import { md2html } from './dist/index.js'
             const pandoc = require('./dist/index.js');
-            pandoc.md2html('# Hello World')
+            md2html('# Hello World')
               .then(result => {
                 console.log('Conversion successful:', result);
                 process.exit(0);

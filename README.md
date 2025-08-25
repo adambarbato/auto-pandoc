@@ -1,10 +1,12 @@
-# pandoc-ts
+# auto-pandoc
 
 ```bash
 WARNING: code mostly written by Claude to use as a personal dependency so some features may be broken. Contributions are open if you find an issue.
 ```
 
-A TypeScript wrapper for [Pandoc](https://pandoc.org/) with automatic binary installation. This package provides a complete TypeScript interface to Pandoc's document conversion capabilities, automatically downloading and installing the Pandoc binary when you install the package.
+A TypeScript wrapper for [Pandoc](https://pandoc.org/) with automatic binary installation. The automatic installation of the pandoc binary is what separates this project from others in the ecosystem.
+
+This package provides a complete TypeScript interface to Pandoc's document conversion capabilities, automatically downloading and installing the Pandoc binary when you install the package.
 
 ## Features
 
@@ -20,7 +22,7 @@ A TypeScript wrapper for [Pandoc](https://pandoc.org/) with automatic binary ins
 ## Installation
 
 ```bash
-npm install pandoc-ts
+npm install auto-pandoc
 ```
 
 The Pandoc binary will be automatically downloaded and installed when you first use the package.
@@ -30,12 +32,12 @@ The Pandoc binary will be automatically downloaded and installed when you first 
 This package automatically manages the Pandoc binary installation:
 
 ✅ **Automatic Installation**: The Pandoc binary downloads automatically when you first use any conversion function
-✅ **Global Installation**: Works with both local and global npm installations  
+✅ **Global Installation**: Works with both local and global npm installations
 ✅ **Cross-platform**: Automatically selects the correct binary for your platform
 ✅ **Lightweight**: Package is only ~125KB - binary downloads separately as needed
 
 ```javascript
-const pandoc = require('pandoc-ts');
+const pandoc = require('auto-pandoc');
 // Binary downloads automatically on first conversion (if not already installed)
 const result = await pandoc.markdownToHtml('# Hello World');
 ```
@@ -45,11 +47,11 @@ You can also install the binary manually if desired:
 
 ```bash
 # For local installations
-cd node_modules/pandoc-ts && npm run install-pandoc
+cd node_modules/auto-pandoc && npm run install-pandoc
 
 # For global installations - binary installs automatically on first use
-npm install -g pandoc-ts
-pandoc-ts --help
+npm install -g auto-pandoc
+auto-pandoc --help
 ```
 
 ## Quick Start
@@ -57,7 +59,7 @@ pandoc-ts --help
 ### Basic Usage
 
 ```typescript
-import { Pandoc, markdownToHtml } from 'pandoc-ts';
+import { Pandoc, markdownToHtml } from 'auto-pandoc';
 
 // Simple markdown to HTML conversion
 // Note: Pandoc binary downloads automatically on first use
@@ -75,7 +77,7 @@ if (result.success) {
 ### File Conversion
 
 ```typescript
-import { Pandoc } from 'pandoc-ts';
+import { Pandoc } from 'auto-pandoc';
 
 // Convert a markdown file to PDF
 const result = await Pandoc.convertFile('input.md', 'output.pdf', {
@@ -93,7 +95,7 @@ if (result.success) {
 ### Advanced Options
 
 ```typescript
-import { Pandoc } from 'pandoc-ts';
+import { Pandoc } from 'auto-pandoc';
 
 const markdown = `
 # My Document
@@ -176,7 +178,7 @@ import {
   markdownToDocx,
   docxToMarkdown,
   markdownToEpub
-} from 'pandoc-ts';
+} from 'auto-pandoc';
 
 // Quick conversions
 const htmlResult = await markdownToHtml('# Title');
@@ -187,7 +189,7 @@ const mdResult = await htmlToMarkdown('<h1>Title</h1>');
 ### Quick Access Functions
 
 ```typescript
-import { md2html, md2pdf, html2md, version, isAvailable } from 'pandoc-ts';
+import { md2html, md2pdf, html2md, version, isAvailable } from 'auto-pandoc';
 
 // Ultra-short function names
 const html = await md2html('# Hello');
@@ -205,16 +207,16 @@ The package includes a CLI tool compatible with pandoc:
 
 ```bash
 # Convert markdown to HTML
-pandoc-ts -f markdown -t html input.md -o output.html
+auto-pandoc -f markdown -t html input.md -o output.html
 
 # Generate PDF with table of contents
-pandoc-ts input.md -t pdf -o output.pdf --toc --pdf-engine=xelatex
+auto-pandoc input.md -t pdf -o output.pdf --toc --pdf-engine=xelatex
 
 # Pipe from stdin
-echo "# Hello World" | pandoc-ts -f markdown -t html
+echo "# Hello World" | auto-pandoc -f markdown -t html
 
 # Use advanced options
-pandoc-ts input.md -t html -s --toc --css=styles.css -o output.html
+auto-pandoc input.md -t html -s --toc --css=styles.css -o output.html
 ```
 
 ## Supported Formats
@@ -249,7 +251,7 @@ pandoc-ts input.md -t html -s --toc --css=styles.css -o output.html
 ## Platform Support
 
 - ✅ **Linux** (x86_64, ARM64, i386) - Automatic binary download
-- ✅ **macOS** (x86_64, ARM64) - Automatic binary download  
+- ✅ **macOS** (x86_64, ARM64) - Automatic binary download
 - ✅ **Windows** (x86_64, i386) - Automatic binary download
 
 The appropriate Pandoc binary is automatically downloaded and installed for your platform on first use.
@@ -309,7 +311,7 @@ interface PandocOptions {
 The package includes presets for common document types:
 
 ```typescript
-import { presets, Pandoc } from 'pandoc-ts';
+import { presets, Pandoc } from 'auto-pandoc';
 
 // Academic paper
 const academicOptions = presets.academicPaper({
@@ -343,7 +345,7 @@ const result = await Pandoc.convert(content, academicOptions);
 ### Document Analysis
 
 ```typescript
-import { extractMetadata, getWordCount, validateMarkdown } from 'pandoc-ts';
+import { extractMetadata, getWordCount, validateMarkdown } from 'auto-pandoc';
 
 // Extract document metadata
 const metadata = await extractMetadata('# Title\n\nContent', 'markdown');
@@ -359,7 +361,7 @@ console.log(validation.valid); // true
 ### Format Conversion Utilities
 
 ```typescript
-import { convertFormat, getSupportedFormats, isOutputFormatSupported } from 'pandoc-ts';
+import { convertFormat, getSupportedFormats, isOutputFormatSupported } from 'auto-pandoc';
 
 // Generic format conversion
 const result = await convertFormat('# Hello', 'markdown', 'latex');
@@ -375,7 +377,7 @@ const isPdfSupported = await isOutputFormatSupported('pdf'); // true
 ## Error Handling
 
 ```typescript
-import { Pandoc } from 'pandoc-ts';
+import { Pandoc } from 'auto-pandoc';
 
 try {
   const result = await Pandoc.convert(input, options);
@@ -394,7 +396,7 @@ try {
   console.error('Error:', error.message);
 
   if (error.message.includes('not found')) {
-    console.error('Pandoc binary not available. Please reinstall pandoc-ts.');
+    console.error('Pandoc binary not available. Please reinstall auto-pandoc.');
   }
 }
 ```
@@ -412,8 +414,8 @@ try {
 
 ```bash
 # Clone the repository
-git clone https://github.com/adambarbato/pandoc-ts.git
-cd pandoc-ts
+git clone https://github.com/adambarbato/auto-pandoc.git
+cd auto-pandoc
 
 # Install dependencies
 npm install
@@ -438,7 +440,7 @@ npm test
 ### Project Structure
 
 ```
-pandoc-ts/
+auto-pandoc/
 ├── src/                 # TypeScript source files
 │   ├── index.ts        # Main exports
 │   ├── pandoc.ts       # Core Pandoc wrapper
@@ -448,7 +450,7 @@ pandoc-ts/
 ├── scripts/            # Installation scripts
 │   └── install-pandoc.js
 ├── bin/                # CLI executable
-│   └── pandoc-ts.js
+│   └── auto-pandoc.js
 └── dist/               # Compiled JavaScript (generated)
 ```
 
@@ -518,7 +520,7 @@ To set up automated publishing:
 
 The published package includes:
 - `dist/` - Compiled JavaScript and type definitions
-- `bin/pandoc-ts.js` - CLI executable (only the script, not the binary)
+- `bin/auto-pandoc.js` - CLI executable (only the script, not the binary)
 - `scripts/` - Installation scripts for downloading Pandoc
 - `package.json`, `README.md`, `LICENSE`
 
@@ -547,8 +549,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 When reporting bugs, please include:
 - Node.js version
-- Operating system  
-- pandoc-ts version
+- Operating system
+- auto-pandoc version
 - Whether Pandoc binary was successfully installed (`pandoc --version`)
 - Minimal code example
 - Error messages and stack traces

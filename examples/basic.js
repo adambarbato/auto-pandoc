@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Basic usage examples for pandoc-ts
+ * Basic usage examples for auto-pandoc
  *
- * This file demonstrates how to use the pandoc-ts library
+ * This file demonstrates how to use the auto-pandoc library
  * for common document conversion tasks.
  */
 
@@ -18,7 +18,7 @@ import {
 } from "../dist/index.js";
 
 async function main() {
-  console.log("🚀 pandoc-ts Examples\n");
+  console.log("🚀 auto-pandoc Examples\n");
 
   // Check if pandoc is available
   const available = await isAvailable();
@@ -98,7 +98,7 @@ Visit [Pandoc](https://pandoc.org/) for more information.
       toc: true,
       metadata: {
         title: "My Sample Document",
-        author: "pandoc-ts Example",
+        author: "auto-pandoc Example",
       },
     });
 
@@ -184,7 +184,7 @@ Visit [Pandoc](https://pandoc.org/) for more information.
     console.log("\n📚 More examples:");
     console.log("- Check the test file: src/test.ts");
     console.log("- Read the README.md for full API documentation");
-    console.log("- Use the CLI: node bin/pandoc-ts.js --help");
+    console.log("- Use the CLI: node bin/auto-pandoc.js --help");
   } catch (error) {
     console.error("❌ Error running examples:", error.message);
   }

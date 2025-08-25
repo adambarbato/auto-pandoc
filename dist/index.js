@@ -1,12 +1,12 @@
 /**
- * pandoc-ts - TypeScript wrapper for Pandoc with automatic binary installation
+ * auto-pandoc - TypeScript wrapper for Pandoc with automatic binary installation
  *
  * This module provides a TypeScript interface to the Pandoc document converter,
  * automatically installing the Pandoc binary when the package is installed.
  *
  * @example
  * ```typescript
- * import { Pandoc, markdownToHtml } from 'pandoc-ts';
+ * import { Pandoc, markdownToHtml } from 'auto-pandoc';
  *
  * // Convert markdown to HTML
  * const result = await markdownToHtml('# Hello World\n\nThis is **bold** text.');
@@ -22,7 +22,7 @@
  * ```
  */
 // Main Pandoc class
-export { Pandoc, default as PandocClass } from './pandoc.js';
+export { Pandoc, default as PandocClass } from "./pandoc.js";
 // Utility functions
 export { 
 // Format conversion utilities
@@ -32,9 +32,9 @@ getSupportedFormats, isInputFormatSupported, isOutputFormatSupported,
 // Document utilities
 createStandaloneHtml, markdownToPresentation, extractMetadata, validateMarkdown, getWordCount, convertBibliography, csvToMarkdownTable, 
 // Presets
-presets } from './utils.js';
+presets, } from "./utils.js";
 // Default export is the main Pandoc class
-export { Pandoc as default } from './pandoc.js';
+export { Pandoc as default } from "./pandoc.js";
 /**
  * Quick start functions for common conversions
  */
@@ -45,7 +45,7 @@ export { Pandoc as default } from './pandoc.js';
  * @returns Promise resolving to conversion result
  */
 export async function md2html(markdown, options = {}) {
-    const { markdownToHtml } = await import('./utils.js');
+    const { markdownToHtml } = await import("./utils.js");
     return markdownToHtml(markdown, options);
 }
 /**
@@ -55,7 +55,7 @@ export async function md2html(markdown, options = {}) {
  * @returns Promise resolving to conversion result
  */
 export async function md2pdf(markdown, options = {}) {
-    const { markdownToPdf } = await import('./utils.js');
+    const { markdownToPdf } = await import("./utils.js");
     return markdownToPdf(markdown, options);
 }
 /**
@@ -65,7 +65,7 @@ export async function md2pdf(markdown, options = {}) {
  * @returns Promise resolving to conversion result
  */
 export async function html2md(html, options = {}) {
-    const { htmlToMarkdown } = await import('./utils.js');
+    const { htmlToMarkdown } = await import("./utils.js");
     return htmlToMarkdown(html, options);
 }
 /**
@@ -73,7 +73,7 @@ export async function html2md(html, options = {}) {
  * @returns Promise resolving to version string
  */
 export async function version() {
-    const { Pandoc } = await import('./pandoc.js');
+    const { Pandoc } = await import("./pandoc.js");
     return Pandoc.getVersion();
 }
 /**
@@ -81,7 +81,7 @@ export async function version() {
  * @returns Promise resolving to binary info
  */
 export async function info() {
-    const { Pandoc } = await import('./pandoc.js');
+    const { Pandoc } = await import("./pandoc.js");
     return Pandoc.getBinaryInfo();
 }
 /**

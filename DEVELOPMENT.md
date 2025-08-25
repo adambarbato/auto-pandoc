@@ -1,11 +1,11 @@
-# Development Guide for pandoc-ts
+# Development Guide for auto-pandoc
 
-This document provides information for developers who want to contribute to or understand the pandoc-ts project.
+This document provides information for developers who want to contribute to or understand the auto-pandoc project.
 
 ## Project Structure
 
 ```
-pandoc-ts/
+auto-pandoc/
 ├── src/                    # TypeScript source code
 │   ├── index.ts           # Main entry point and exports
 │   ├── pandoc.ts          # Core Pandoc wrapper class
@@ -13,7 +13,7 @@ pandoc-ts/
 │   ├── utils.ts           # Utility functions and convenience methods
 │   └── test.ts            # Test suite
 ├── bin/                   # CLI executable
-│   └── pandoc-ts.js       # Command-line interface
+│   └── auto-pandoc.js     # Command-line interface
 ├── scripts/               # Build and installation scripts
 │   └── install-pandoc.js  # Pandoc binary installation script
 ├── examples/              # Usage examples
@@ -55,7 +55,7 @@ pandoc-ts/
    - Platform detection and asset selection
    - Fallback to system pandoc installation
 
-5. **CLI Tool** (`bin/pandoc-ts.js`)
+5. **CLI Tool** (`bin/auto-pandoc.js`)
    - Command-line interface compatible with pandoc
    - Argument parsing and validation
    - File and stream handling
@@ -81,7 +81,7 @@ pandoc-ts/
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd pandoc-ts
+cd auto-pandoc
 
 # Install dependencies
 npm install
@@ -331,7 +331,7 @@ The published package includes:
 When reporting issues, include:
 - Operating system and version
 - Node.js version
-- pandoc-ts version
+- auto-pandoc version
 - Minimal reproduction example
 - Error messages and stack traces
 
@@ -376,9 +376,9 @@ When reporting issues, include:
 - Verify all dependencies are current
 
 **CLI Tool Not Working**
-- Check that binary is executable (`chmod +x bin/pandoc-ts.js`)
+- Check that binary is executable (`chmod +x bin/auto-pandoc.js`)
 - Verify Node.js shebang line is correct
-- Test with `node bin/pandoc-ts.js` directly
+- Test with `node bin/auto-pandoc.js` directly
 
 ### Debug Mode
 
@@ -386,7 +386,7 @@ Enable verbose logging:
 
 ```bash
 # For CLI
-pandoc-ts --verbose input.md -o output.html
+auto-pandoc --verbose input.md -o output.html
 
 # For programmatic use
 const result = await Pandoc.convert(input, { verbose: true });

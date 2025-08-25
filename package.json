@@ -1,5 +1,5 @@
 {
-  "name": "pandoc-ts",
+  "name": "auto-pandoc",
   "version": "1.0.0",
   "description": "TypeScript wrapper for pandoc with automatic binary installation",
   "main": "dist/index.js",
@@ -19,16 +19,16 @@
     "dist/*.js.map",
     "dist/*.d.ts.map",
     "!dist/test.*",
-    "bin/pandoc-ts.js",
+    "bin/auto-pandoc.js",
     "scripts"
   ],
   "bin": {
-    "pandoc-ts": "./bin/pandoc-ts.js"
+    "auto-pandoc": "./bin/auto-pandoc.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.prod.json",
     "install-pandoc": "node scripts/install-pandoc.js",
-    "postinstall": "echo '\n🚀 pandoc-ts installed successfully!\n📦 Pandoc binary will download automatically on first use.\n💡 Or run: npm run install-pandoc to install immediately.\n'",
+    "postinstall": "echo '\n🚀 auto-pandoc installed successfully!\n📦 Pandoc binary will download automatically on first use.\n💡 Or run: npm run install-pandoc to install immediately.\n'",
     "test": "tsc -p tsconfig.test.json && node --test dist/test.js",
     "test:watch": "npm run test -- --watch",
     "dev": "tsc --watch",
@@ -48,7 +48,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adambarbato/pandoc-ts.git"
+    "url": "git+https://github.com/adambarbato/auto-pandoc.git"
   },
   "dependencies": {
     "@types/node": "^20.11.0",

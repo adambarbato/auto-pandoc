@@ -131,7 +131,7 @@ async function getLatestRelease() {
 
   try {
     const headers = {
-      "User-Agent": "pandoc-ts-installer",
+      "User-Agent": "auto-pandoc-installer",
     };
 
     // Use GitHub token if available to avoid rate limiting

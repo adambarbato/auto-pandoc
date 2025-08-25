@@ -1,27 +1,22 @@
 {
   "name": "my-pandoc-project",
   "version": "1.0.0",
-  "description": "Example project using pandoc-ts",
+  "description": "Example project using auto-pandoc",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "build": "node convert.js",
-    "convert": "pandoc-ts",
+    "convert": "auto-pandoc",
     "dev": "node --watch convert.js"
   },
   "dependencies": {
-    "pandoc-ts": "^1.0.0"
+    "auto-pandoc": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
   },
-  "keywords": [
-    "pandoc",
-    "markdown",
-    "conversion",
-    "typescript"
-  ],
+  "keywords": ["pandoc", "markdown", "conversion", "typescript"],
   "author": "Your Name",
   "license": "MIT"
 }

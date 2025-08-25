@@ -1,12 +1,12 @@
 /**
- * pandoc-ts - TypeScript wrapper for Pandoc with automatic binary installation
+ * auto-pandoc - TypeScript wrapper for Pandoc with automatic binary installation
  *
  * This module provides a TypeScript interface to the Pandoc document converter,
  * automatically installing the Pandoc binary when the package is installed.
  *
  * @example
  * ```typescript
- * import { Pandoc, markdownToHtml } from 'pandoc-ts';
+ * import { Pandoc, markdownToHtml } from 'auto-pandoc';
  *
  * // Convert markdown to HTML
  * const result = await markdownToHtml('# Hello World\n\nThis is **bold** text.');
@@ -23,7 +23,7 @@
  */
 
 // Main Pandoc class
-export { Pandoc, default as PandocClass } from './pandoc.js';
+export { Pandoc, default as PandocClass } from "./pandoc.js";
 
 // Type definitions
 export type {
@@ -34,8 +34,8 @@ export type {
   PandocResult,
   PandocBinary,
   InstallOptions,
-  ExecOptions
-} from './types.js';
+  ExecOptions,
+} from "./types.js";
 
 // Utility functions
 export {
@@ -65,11 +65,11 @@ export {
   csvToMarkdownTable,
 
   // Presets
-  presets
-} from './utils.js';
+  presets,
+} from "./utils.js";
 
 // Default export is the main Pandoc class
-export { Pandoc as default } from './pandoc.js';
+export { Pandoc as default } from "./pandoc.js";
 
 /**
  * Quick start functions for common conversions
@@ -81,8 +81,11 @@ export { Pandoc as default } from './pandoc.js';
  * @param options - Pandoc options (excluding from/to)
  * @returns Promise resolving to conversion result
  */
-export async function md2html(markdown: string, options: Omit<import('./types.js').PandocOptions, 'from' | 'to'> = {}) {
-  const { markdownToHtml } = await import('./utils.js');
+export async function md2html(
+  markdown: string,
+  options: Omit<import("./types.js").PandocOptions, "from" | "to"> = {},
+) {
+  const { markdownToHtml } = await import("./utils.js");
   return markdownToHtml(markdown, options);
 }
 
@@ -92,8 +95,11 @@ export async function md2html(markdown: string, options: Omit<import('./types.js
  * @param options - Pandoc options (excluding from/to)
  * @returns Promise resolving to conversion result
  */
-export async function md2pdf(markdown: string, options: Omit<import('./types.js').PandocOptions, 'from' | 'to'> = {}) {
-  const { markdownToPdf } = await import('./utils.js');
+export async function md2pdf(
+  markdown: string,
+  options: Omit<import("./types.js").PandocOptions, "from" | "to"> = {},
+) {
+  const { markdownToPdf } = await import("./utils.js");
   return markdownToPdf(markdown, options);
 }
 
@@ -103,8 +109,11 @@ export async function md2pdf(markdown: string, options: Omit<import('./types.js'
  * @param options - Pandoc options (excluding from/to)
  * @returns Promise resolving to conversion result
  */
-export async function html2md(html: string, options: Omit<import('./types.js').PandocOptions, 'from' | 'to'> = {}) {
-  const { htmlToMarkdown } = await import('./utils.js');
+export async function html2md(
+  html: string,
+  options: Omit<import("./types.js").PandocOptions, "from" | "to"> = {},
+) {
+  const { htmlToMarkdown } = await import("./utils.js");
   return htmlToMarkdown(html, options);
 }
 
@@ -113,7 +122,7 @@ export async function html2md(html: string, options: Omit<import('./types.js').P
  * @returns Promise resolving to version string
  */
 export async function version(): Promise<string> {
-  const { Pandoc } = await import('./pandoc.js');
+  const { Pandoc } = await import("./pandoc.js");
   return Pandoc.getVersion();
 }
 
@@ -121,8 +130,8 @@ export async function version(): Promise<string> {
  * Get pandoc binary information
  * @returns Promise resolving to binary info
  */
-export async function info(): Promise<import('./types.js').PandocBinary> {
-  const { Pandoc } = await import('./pandoc.js');
+export async function info(): Promise<import("./types.js").PandocBinary> {
+  const { Pandoc } = await import("./pandoc.js");
   return Pandoc.getBinaryInfo();
 }
 

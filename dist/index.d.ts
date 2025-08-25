@@ -1,12 +1,12 @@
 /**
- * pandoc-ts - TypeScript wrapper for Pandoc with automatic binary installation
+ * auto-pandoc - TypeScript wrapper for Pandoc with automatic binary installation
  *
  * This module provides a TypeScript interface to the Pandoc document converter,
  * automatically installing the Pandoc binary when the package is installed.
  *
  * @example
  * ```typescript
- * import { Pandoc, markdownToHtml } from 'pandoc-ts';
+ * import { Pandoc, markdownToHtml } from 'auto-pandoc';
  *
  * // Convert markdown to HTML
  * const result = await markdownToHtml('# Hello World\n\nThis is **bold** text.');
@@ -21,10 +21,10 @@
  * });
  * ```
  */
-export { Pandoc, default as PandocClass } from './pandoc.js';
-export type { PandocFormat, CitationStyle, HighlightStyle, PandocOptions, PandocResult, PandocBinary, InstallOptions, ExecOptions } from './types.js';
-export { markdownToHtml, markdownToPdf, htmlToMarkdown, latexToHtml, docxToMarkdown, markdownToDocx, markdownToEpub, convertFormat, convertFileFormat, getSupportedFormats, isInputFormatSupported, isOutputFormatSupported, createStandaloneHtml, markdownToPresentation, extractMetadata, validateMarkdown, getWordCount, convertBibliography, csvToMarkdownTable, presets } from './utils.js';
-export { Pandoc as default } from './pandoc.js';
+export { Pandoc, default as PandocClass } from "./pandoc.js";
+export type { PandocFormat, CitationStyle, HighlightStyle, PandocOptions, PandocResult, PandocBinary, InstallOptions, ExecOptions, } from "./types.js";
+export { markdownToHtml, markdownToPdf, htmlToMarkdown, latexToHtml, docxToMarkdown, markdownToDocx, markdownToEpub, convertFormat, convertFileFormat, getSupportedFormats, isInputFormatSupported, isOutputFormatSupported, createStandaloneHtml, markdownToPresentation, extractMetadata, validateMarkdown, getWordCount, convertBibliography, csvToMarkdownTable, presets, } from "./utils.js";
+export { Pandoc as default } from "./pandoc.js";
 /**
  * Quick start functions for common conversions
  */
@@ -34,21 +34,21 @@ export { Pandoc as default } from './pandoc.js';
  * @param options - Pandoc options (excluding from/to)
  * @returns Promise resolving to conversion result
  */
-export declare function md2html(markdown: string, options?: Omit<import('./types.js').PandocOptions, 'from' | 'to'>): Promise<import("./types.js").PandocResult>;
+export declare function md2html(markdown: string, options?: Omit<import("./types.js").PandocOptions, "from" | "to">): Promise<import("./types.js").PandocResult>;
 /**
  * Convert markdown string to PDF
  * @param markdown - Markdown content to convert
  * @param options - Pandoc options (excluding from/to)
  * @returns Promise resolving to conversion result
  */
-export declare function md2pdf(markdown: string, options?: Omit<import('./types.js').PandocOptions, 'from' | 'to'>): Promise<import("./types.js").PandocResult>;
+export declare function md2pdf(markdown: string, options?: Omit<import("./types.js").PandocOptions, "from" | "to">): Promise<import("./types.js").PandocResult>;
 /**
  * Convert HTML string to markdown
  * @param html - HTML content to convert
  * @param options - Pandoc options (excluding from/to)
  * @returns Promise resolving to conversion result
  */
-export declare function html2md(html: string, options?: Omit<import('./types.js').PandocOptions, 'from' | 'to'>): Promise<import("./types.js").PandocResult>;
+export declare function html2md(html: string, options?: Omit<import("./types.js").PandocOptions, "from" | "to">): Promise<import("./types.js").PandocResult>;
 /**
  * Get pandoc version information
  * @returns Promise resolving to version string
@@ -58,7 +58,7 @@ export declare function version(): Promise<string>;
  * Get pandoc binary information
  * @returns Promise resolving to binary info
  */
-export declare function info(): Promise<import('./types.js').PandocBinary>;
+export declare function info(): Promise<import("./types.js").PandocBinary>;
 /**
  * Check if pandoc is available
  * @returns Promise resolving to boolean indicating availability

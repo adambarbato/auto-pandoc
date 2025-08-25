@@ -1,5 +1,5 @@
 /**
- * Basic tests for pandoc-ts
+ * Basic tests for auto-pandoc
  * Run with: node --test dist/test.js
  */
 
@@ -263,7 +263,7 @@ test("Error handling", async (t) => {
   });
 });
 
-console.log("Running pandoc-ts tests...");
+console.log("Running auto-pandoc tests...");
 console.log(
   "Note: Some tests will be skipped if Pandoc binary is not available",
 );

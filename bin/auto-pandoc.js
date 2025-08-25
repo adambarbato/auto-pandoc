@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * CLI wrapper for pandoc-ts
- * Provides a command-line interface to the pandoc-ts library
+ * CLI wrapper for auto-pandoc
+ * Provides a command-line interface to the auto-pandoc library
  */
 
-import { promises as fs } from 'fs';
-import { join, resolve, extname, basename } from 'path';
-import { Pandoc } from '../dist/pandoc.js';
+import { promises as fs } from "fs";
+import { join, resolve, extname, basename } from "path";
+import { Pandoc } from "../dist/pandoc.js";
 
-const VERSION = '1.0.0';
+const VERSION = "1.0.0";
 
 /**
  * Print help information
  */
 function printHelp() {
   console.log(`
-pandoc-ts v${VERSION} - TypeScript wrapper for Pandoc
+auto-pandoc v${VERSION} - TypeScript wrapper for Pandoc
 
 USAGE:
-  pandoc-ts [OPTIONS] [INPUT_FILE]
+  auto-pandoc [OPTIONS] [INPUT_FILE]
 
 OPTIONS:
   -f, --from FORMAT         Input format (default: auto-detect)
@@ -53,16 +53,16 @@ FORMATS:
 
 EXAMPLES:
   # Convert markdown to HTML
-  pandoc-ts -f markdown -t html input.md -o output.html
+  auto-pandoc -f markdown -t html input.md -o output.html
 
   # Convert to PDF with custom options
-  pandoc-ts input.md -t pdf -o output.pdf --pdf-engine=xelatex
+  auto-pandoc input.md -t pdf -o output.pdf --pdf-engine=xelatex
 
   # Pipe input from stdin
-  echo "# Hello" | pandoc-ts -f markdown -t html
+  echo "# Hello" | auto-pandoc -f markdown -t html
 
   # Generate standalone HTML with table of contents
-  pandoc-ts input.md -t html -s --toc -o output.html
+  auto-pandoc input.md -t html -s --toc -o output.html
 
 For more information, visit: https://pandoc.org/
 `);
@@ -74,7 +74,7 @@ For more information, visit: https://pandoc.org/
 function parseArgs(args) {
   const options = {
     from: null,
-    to: 'html',
+    to: "html",
     output: null,
     standalone: false,
     template: null,
@@ -98,7 +98,7 @@ function parseArgs(args) {
     variables: {},
     metadata: {},
     help: false,
-    version: false
+    version: false,
   };
 
   const inputFiles = [];
@@ -108,95 +108,95 @@ function parseArgs(args) {
     const arg = args[i];
 
     switch (arg) {
-      case '-h':
-      case '--help':
+      case "-h":
+      case "--help":
         options.help = true;
         break;
-      case '--version':
+      case "--version":
         options.version = true;
         break;
-      case '-f':
-      case '--from':
+      case "-f":
+      case "--from":
         options.from = args[++i];
         break;
-      case '-t':
-      case '--to':
+      case "-t":
+      case "--to":
         options.to = args[++i];
         break;
-      case '-o':
-      case '--output':
+      case "-o":
+      case "--output":
         options.output = args[++i];
         break;
-      case '-s':
-      case '--standalone':
+      case "-s":
+      case "--standalone":
         options.standalone = true;
         break;
-      case '--template':
+      case "--template":
         options.template = args[++i];
         break;
-      case '--toc':
+      case "--toc":
         options.toc = true;
         break;
-      case '--toc-depth':
+      case "--toc-depth":
         options.tocDepth = parseInt(args[++i]);
         break;
-      case '--number-sections':
+      case "--number-sections":
         options.numberSections = true;
         break;
-      case '--highlight-style':
+      case "--highlight-style":
         options.highlightStyle = args[++i];
         break;
-      case '--no-highlight':
+      case "--no-highlight":
         options.noHighlight = true;
         break;
-      case '--mathml':
+      case "--mathml":
         options.mathml = true;
         break;
-      case '--mathjax':
+      case "--mathjax":
         options.mathjax = true;
         break;
-      case '--katex':
+      case "--katex":
         options.katex = true;
         break;
-      case '--css':
+      case "--css":
         options.css.push(args[++i]);
         break;
-      case '--self-contained':
+      case "--self-contained":
         options.selfContained = true;
         break;
-      case '--pdf-engine':
+      case "--pdf-engine":
         options.pdfEngine = args[++i];
         break;
-      case '--bibliography':
+      case "--bibliography":
         options.bibliography.push(args[++i]);
         break;
-      case '--csl':
+      case "--csl":
         options.csl = args[++i];
         break;
-      case '--filter':
+      case "--filter":
         options.filters.push(args[++i]);
         break;
-      case '--lua-filter':
+      case "--lua-filter":
         options.luaFilters.push(args[++i]);
         break;
-      case '--verbose':
+      case "--verbose":
         options.verbose = true;
         break;
-      case '--quiet':
+      case "--quiet":
         options.quiet = true;
         break;
-      case '-V':
-      case '--variable':
-        const varPair = args[++i].split('=', 2);
-        options.variables[varPair[0]] = varPair[1] || '';
+      case "-V":
+      case "--variable":
+        const varPair = args[++i].split("=", 2);
+        options.variables[varPair[0]] = varPair[1] || "";
         break;
-      case '-M':
-      case '--metadata':
-        const metaPair = args[++i].split('=', 2);
-        options.metadata[metaPair[0]] = varPair[1] || '';
+      case "-M":
+      case "--metadata":
+        const metaPair = args[++i].split("=", 2);
+        options.metadata[metaPair[0]] = varPair[1] || "";
         break;
       default:
-        if (arg.startsWith('-')) {
+        if (arg.startsWith("-")) {
           console.error(`Unknown option: ${arg}`);
           process.exit(1);
         } else {
@@ -216,24 +216,24 @@ function parseArgs(args) {
 function detectInputFormat(filename) {
   const ext = extname(filename).toLowerCase();
   const formatMap = {
-    '.md': 'markdown',
-    '.markdown': 'markdown',
-    '.mdown': 'markdown',
-    '.mkd': 'markdown',
-    '.mkdn': 'markdown',
-    '.html': 'html',
-    '.htm': 'html',
-    '.tex': 'latex',
-    '.latex': 'latex',
-    '.rst': 'rst',
-    '.org': 'org',
-    '.docx': 'docx',
-    '.epub': 'epub',
-    '.fb2': 'fb2',
-    '.odt': 'odt',
-    '.rtf': 'rtf'
+    ".md": "markdown",
+    ".markdown": "markdown",
+    ".mdown": "markdown",
+    ".mkd": "markdown",
+    ".mkdn": "markdown",
+    ".html": "html",
+    ".htm": "html",
+    ".tex": "latex",
+    ".latex": "latex",
+    ".rst": "rst",
+    ".org": "org",
+    ".docx": "docx",
+    ".epub": "epub",
+    ".fb2": "fb2",
+    ".odt": "odt",
+    ".rtf": "rtf",
   };
-  return formatMap[ext] || 'markdown';
+  return formatMap[ext] || "markdown";
 }
 
 /**
@@ -244,7 +244,7 @@ async function readStdin() {
   for await (const chunk of process.stdin) {
     chunks.push(chunk);
   }
-  return Buffer.concat(chunks).toString('utf8');
+  return Buffer.concat(chunks).toString("utf8");
 }
 
 /**
@@ -268,17 +268,17 @@ async function main() {
   if (options.version) {
     try {
       const version = await Pandoc.getVersion();
-      console.log(`pandoc-ts v${VERSION}`);
+      console.log(`auto-pandoc v${VERSION}`);
       console.log(`pandoc v${version}`);
     } catch (error) {
-      console.log(`pandoc-ts v${VERSION}`);
-      console.log('pandoc: not available');
+      console.log(`auto-pandoc v${VERSION}`);
+      console.log("pandoc: not available");
     }
     return;
   }
 
   try {
-    let input = '';
+    let input = "";
     let inputPath = null;
 
     // Read input
@@ -293,7 +293,7 @@ async function main() {
       // Read from stdin
       input = await readStdin();
       if (!options.from) {
-        options.from = 'markdown';
+        options.from = "markdown";
       }
     }
 
@@ -323,7 +323,7 @@ async function main() {
     }
 
     // Clean up null values
-    Object.keys(options).forEach(key => {
+    Object.keys(options).forEach((key) => {
       if (options[key] === null || options[key] === false) {
         delete options[key];
       }
@@ -340,15 +340,15 @@ async function main() {
     // Handle results
     if (!result.success) {
       if (result.error) {
-        console.error('Error:', result.error);
+        console.error("Error:", result.error);
       }
       process.exit(1);
     }
 
     // Print warnings if not quiet
     if (!options.quiet && result.warnings && result.warnings.length > 0) {
-      result.warnings.forEach(warning => {
-        console.warn('Warning:', warning);
+      result.warnings.forEach((warning) => {
+        console.warn("Warning:", warning);
       });
     }
 
@@ -358,14 +358,20 @@ async function main() {
     } else if (options.verbose && options.output) {
       console.error(`Output written to: ${options.output}`);
     }
-
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error("Error:", error.message);
 
-    if (error.message.includes('not found') || error.message.includes('ENOENT')) {
-      console.error('\nPandoc binary not found. Please ensure pandoc is installed.');
-      console.error('You can install it from: https://pandoc.org/installing.html');
-      console.error('Or run: npm install pandoc-ts --save');
+    if (
+      error.message.includes("not found") ||
+      error.message.includes("ENOENT")
+    ) {
+      console.error(
+        "\nPandoc binary not found. Please ensure pandoc is installed.",
+      );
+      console.error(
+        "You can install it from: https://pandoc.org/installing.html",
+      );
+      console.error("Or run: npm install auto-pandoc --save");
     }
 
     process.exit(1);
@@ -373,18 +379,18 @@ async function main() {
 }
 
 // Handle uncaught errors
-process.on('unhandledRejection', (error) => {
-  console.error('Unhandled error:', error.message);
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled error:", error.message);
   process.exit(1);
 });
 
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught exception:', error.message);
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error.message);
   process.exit(1);
 });
 
 // Run main function
-main().catch(error => {
-  console.error('Fatal error:', error.message);
+main().catch((error) => {
+  console.error("Fatal error:", error.message);
   process.exit(1);
 });

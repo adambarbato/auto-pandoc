@@ -145,22 +145,22 @@ const htmlResult = await epubToHtml('book.epub', 'output.html');
 
 ### EPUB with Media Extraction
 
-When converting EPUB files, you can use the `extractMedia` option to automatically extract images, fonts, and other media files to a directory:
+When converting EPUB files, you can use the `extractMedia` option to automatically extract images, fonts, and other media files to a directory. **All media links are automatically converted to relative paths**, ensuring portability of the output files:
 
 ```typescript
 import { epubToMarkdown, epubToHtml } from 'auto-pandoc';
 
-// Extract EPUB to Markdown with media
+// Extract EPUB to Markdown with media (links will be relative)
 const result = await epubToMarkdown('book.epub', 'output.md', {
-  extractMedia: './book-media',  // Images and media extracted here
+  extractMedia: './book-media',  // Images and media extracted here with relative links
   standalone: true
 });
 
-// Extract EPUB to HTML with media in separate directory
+// Extract EPUB to HTML with media in separate directory (relative links)
 const htmlResult = await epubToHtml('book.epub', 'output.html', {
-  extractMedia: './html-media',
+  extractMedia: './html-media',  // Media links will be relative to output.html
   standalone: true,
-  selfContained: false  // Keep media as separate files
+  selfContained: false  // Keep media as separate files with relative paths
 });
 ```
 
@@ -197,6 +197,15 @@ const result = await epubToMarkdown('book.epub', 'book.md', {
   }
 });
 ```
+
+### Relative vs Absolute Links
+
+When using `extractMedia`, the library automatically ensures that all links to extracted media files are **relative paths** rather than absolute paths. This means:
+
+- ✅ Links like `![Image](media/image.png)` or `<img src="media/image.png">`
+- ❌ Not `![Image](/full/path/to/media/image.png)` or `<img src="/full/path/to/media/image.png">`
+
+This behavior is automatic and makes your extracted content portable - you can move the output directory anywhere and the links will continue to work. The relative linking is implemented via a Lua filter that runs automatically when `extractMedia` is specified.
 
 ### Running the Example
 

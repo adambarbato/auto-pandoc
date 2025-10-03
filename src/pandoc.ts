@@ -1,8 +1,8 @@
 import { spawn, SpawnOptions } from "child_process";
 import { promises as fs } from "fs";
-import { join, resolve } from "path";
+import { join, resolve, dirname, basename } from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+
 import type {
   PandocOptions,
   PandocResult,
@@ -190,23 +190,34 @@ export class Pandoc {
       };
     }
 
+    // If extractMedia is specified and outputPath is provided,
+    // set CWD to the output directory so extractMedia paths are relative to the output
+    let execOptions: ExecOptions = {
+      timeout: options.verbose ? 60000 : 30000,
+    };
+
+    if (options.extractMedia && outputPath) {
+      const outputDir = dirname(resolve(outputPath));
+      execOptions.cwd = outputDir;
+
+      // Make output path relative to the output directory
+      outputPath = basename(outputPath);
+    }
+
     const args = [
       resolvedInputPath,
       ...this.buildArgs({ ...options, output: outputPath }),
     ];
 
     try {
-      const result = await this.execPandoc(
-        args,
-        {
-          timeout: options.verbose ? 60000 : 30000,
-        },
-        binaryPath,
-      );
+      const result = await this.execPandoc(args, execOptions, binaryPath);
 
       return {
         output: outputPath ? undefined : result.output,
-        outputPath,
+        outputPath:
+          outputPath && execOptions.cwd
+            ? join(execOptions.cwd, outputPath)
+            : outputPath,
         success: result.success,
         error: result.error,
         warnings: this.parseWarnings(result.output || ""),

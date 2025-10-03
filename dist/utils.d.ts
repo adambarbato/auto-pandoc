@@ -37,10 +37,49 @@ export declare function markdownToDocx(inputPath: string, outputPath?: string, o
 export declare function markdownToEpub(inputPath: string, outputPath?: string, options?: Omit<PandocOptions, "from" | "to">): Promise<PandocResult>;
 /**
  * Convenience function to convert EPUB to markdown
+ *
+ * When using the `extractMedia` option, this function automatically ensures that
+ * all links to extracted media files are relative paths rather than absolute paths.
+ * This makes the output portable - you can move the output directory and media
+ * files together without breaking the links.
+ *
+ * @param inputPath - Path to the EPUB file
+ * @param outputPath - Path for the output Markdown file (optional)
+ * @param options - Pandoc conversion options
+ * @returns Promise<PandocResult> - The conversion result
+ *
+ * @example
+ * ```typescript
+ * // Extract EPUB with relative media links
+ * const result = await epubToMarkdown('book.epub', 'output.md', {
+ *   extractMedia: './media',  // Media files extracted with relative links
+ *   standalone: true
+ * });
+ * ```
  */
 export declare function epubToMarkdown(inputPath: string, outputPath?: string, options?: Omit<PandocOptions, "from" | "to">): Promise<PandocResult>;
 /**
  * Convenience function to convert EPUB to HTML
+ *
+ * When using the `extractMedia` option, this function automatically ensures that
+ * all links to extracted media files are relative paths rather than absolute paths.
+ * This makes the output portable - you can move the output directory and media
+ * files together without breaking the links.
+ *
+ * @param inputPath - Path to the EPUB file
+ * @param outputPath - Path for the output HTML file (optional)
+ * @param options - Pandoc conversion options
+ * @returns Promise<PandocResult> - The conversion result
+ *
+ * @example
+ * ```typescript
+ * // Extract EPUB with relative media links
+ * const result = await epubToHtml('book.epub', 'output.html', {
+ *   extractMedia: './media',  // Media files extracted with relative links
+ *   standalone: true,
+ *   selfContained: false
+ * });
+ * ```
  */
 export declare function epubToHtml(inputPath: string, outputPath?: string, options?: Omit<PandocOptions, "from" | "to">): Promise<PandocResult>;
 /**

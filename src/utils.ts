@@ -1,5 +1,10 @@
 import { Pandoc } from "./pandoc.js";
 import type { PandocOptions, PandocResult, PandocFormat } from "./types.js";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Check if pandoc is available
@@ -123,31 +128,96 @@ export async function markdownToEpub(
 
 /**
  * Convenience function to convert EPUB to markdown
+ *
+ * When using the `extractMedia` option, this function automatically ensures that
+ * all links to extracted media files are relative paths rather than absolute paths.
+ * This makes the output portable - you can move the output directory and media
+ * files together without breaking the links.
+ *
+ * @param inputPath - Path to the EPUB file
+ * @param outputPath - Path for the output Markdown file (optional)
+ * @param options - Pandoc conversion options
+ * @returns Promise<PandocResult> - The conversion result
+ *
+ * @example
+ * ```typescript
+ * // Extract EPUB with relative media links
+ * const result = await epubToMarkdown('book.epub', 'output.md', {
+ *   extractMedia: './media',  // Media files extracted with relative links
+ *   standalone: true
+ * });
+ * ```
  */
 export async function epubToMarkdown(
   inputPath: string,
   outputPath?: string,
   options: Omit<PandocOptions, "from" | "to"> = {},
 ): Promise<PandocResult> {
+  // If extractMedia is specified, add the relative links filter
+  // This ensures all media links use relative paths instead of absolute paths
+  const enhancedOptions = { ...options };
+  if (enhancedOptions.extractMedia) {
+    const filterPath = join(__dirname, "filters", "relative-links.lua");
+    const existingLuaFilters = enhancedOptions.luaFilters
+      ? Array.isArray(enhancedOptions.luaFilters)
+        ? enhancedOptions.luaFilters
+        : [enhancedOptions.luaFilters]
+      : [];
+    enhancedOptions.luaFilters = [...existingLuaFilters, filterPath];
+  }
+
   return Pandoc.convertFile(inputPath, outputPath, {
     from: "epub",
     to: "markdown",
-    ...options,
+    ...enhancedOptions,
   });
 }
 
 /**
  * Convenience function to convert EPUB to HTML
+ *
+ * When using the `extractMedia` option, this function automatically ensures that
+ * all links to extracted media files are relative paths rather than absolute paths.
+ * This makes the output portable - you can move the output directory and media
+ * files together without breaking the links.
+ *
+ * @param inputPath - Path to the EPUB file
+ * @param outputPath - Path for the output HTML file (optional)
+ * @param options - Pandoc conversion options
+ * @returns Promise<PandocResult> - The conversion result
+ *
+ * @example
+ * ```typescript
+ * // Extract EPUB with relative media links
+ * const result = await epubToHtml('book.epub', 'output.html', {
+ *   extractMedia: './media',  // Media files extracted with relative links
+ *   standalone: true,
+ *   selfContained: false
+ * });
+ * ```
  */
 export async function epubToHtml(
   inputPath: string,
   outputPath?: string,
   options: Omit<PandocOptions, "from" | "to"> = {},
 ): Promise<PandocResult> {
+  // If extractMedia is specified, add the relative links filter
+  // This ensures all media links use relative paths instead of absolute paths
+  const enhancedOptions = { ...options };
+  if (enhancedOptions.extractMedia) {
+    const filterPath = join(__dirname, "filters", "relative-links.lua");
+    const existingLuaFilters = enhancedOptions.luaFilters
+      ? Array.isArray(enhancedOptions.luaFilters)
+        ? enhancedOptions.luaFilters
+        : [enhancedOptions.luaFilters]
+      : [];
+    enhancedOptions.luaFilters = [...existingLuaFilters, filterPath];
+  }
+
   return Pandoc.convertFile(inputPath, outputPath, {
     from: "epub",
     to: "html",
-    ...options,
+    ...enhancedOptions,
   });
 }
 

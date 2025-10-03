@@ -122,6 +122,36 @@ export async function markdownToEpub(
 }
 
 /**
+ * Convenience function to convert EPUB to markdown
+ */
+export async function epubToMarkdown(
+  inputPath: string,
+  outputPath?: string,
+  options: Omit<PandocOptions, "from" | "to"> = {},
+): Promise<PandocResult> {
+  return Pandoc.convertFile(inputPath, outputPath, {
+    from: "epub",
+    to: "markdown",
+    ...options,
+  });
+}
+
+/**
+ * Convenience function to convert EPUB to HTML
+ */
+export async function epubToHtml(
+  inputPath: string,
+  outputPath?: string,
+  options: Omit<PandocOptions, "from" | "to"> = {},
+): Promise<PandocResult> {
+  return Pandoc.convertFile(inputPath, outputPath, {
+    from: "epub",
+    to: "html",
+    ...options,
+  });
+}
+
+/**
  * Convenience function to convert any format to any format
  */
 export async function convertFormat(

@@ -88,6 +88,26 @@ export async function markdownToEpub(inputPath, outputPath, options = {}) {
     });
 }
 /**
+ * Convenience function to convert EPUB to markdown
+ */
+export async function epubToMarkdown(inputPath, outputPath, options = {}) {
+    return Pandoc.convertFile(inputPath, outputPath, {
+        from: "epub",
+        to: "markdown",
+        ...options,
+    });
+}
+/**
+ * Convenience function to convert EPUB to HTML
+ */
+export async function epubToHtml(inputPath, outputPath, options = {}) {
+    return Pandoc.convertFile(inputPath, outputPath, {
+        from: "epub",
+        to: "html",
+        ...options,
+    });
+}
+/**
  * Convenience function to convert any format to any format
  */
 export async function convertFormat(input, from, to, options = {}) {

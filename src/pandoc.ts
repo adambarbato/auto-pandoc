@@ -334,20 +334,20 @@ export class Pandoc {
         }, options.timeout);
       }
 
-      child.stdout?.on("data", (data) => {
-        stdout += data.toString(options.encoding || "utf8");
+      child.stdout?.on("data", (data: Buffer) => {
+        stdout += data.toString((options.encoding as BufferEncoding) || "utf8");
       });
 
-      child.stderr?.on("data", (data) => {
-        stderr += data.toString(options.encoding || "utf8");
+      child.stderr?.on("data", (data: Buffer) => {
+        stderr += data.toString((options.encoding as BufferEncoding) || "utf8");
       });
 
-      child.on("error", (error) => {
+      child.on("error", (error: Error) => {
         if (timeoutId) clearTimeout(timeoutId);
         reject(error);
       });
 
-      child.on("close", (code) => {
+      child.on("close", (code: number | null) => {
         if (timeoutId) clearTimeout(timeoutId);
 
         const success = code === 0;
@@ -362,7 +362,7 @@ export class Pandoc {
       if (options.input && child.stdin) {
         child.stdin.write(
           options.input,
-          (options.encoding as BufferEncoding) || "utf8",
+          ((options.encoding as BufferEncoding) || "utf8") as BufferEncoding,
         );
         child.stdin.end();
       } else if (child.stdin) {
@@ -507,6 +507,10 @@ export class Pandoc {
     if (options.referenceLocation)
       args.push("--reference-location", options.referenceLocation);
 
+    // Extract media
+    if (options.extractMedia)
+      args.push("--extract-media", options.extractMedia);
+
     // Other options
     if (options.failIfWarnings) args.push("--fail-if-warnings");
     if (options.verbose) args.push("--verbose");
@@ -572,7 +576,7 @@ export class Pandoc {
     return new Promise((resolve, reject) => {
       const child = spawn("node", [scriptPath], { stdio: "inherit" });
 
-      child.on("close", (code) => {
+      child.on("close", (code: number | null) => {
         if (code === 0) {
           resolve();
         } else {

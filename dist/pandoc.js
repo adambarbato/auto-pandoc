@@ -265,7 +265,7 @@ export class Pandoc {
             });
             // Send input if provided
             if (options.input && child.stdin) {
-                child.stdin.write(options.input, options.encoding || "utf8");
+                child.stdin.write(options.input, (options.encoding || "utf8"));
                 child.stdin.end();
             }
             else if (child.stdin) {
@@ -412,6 +412,9 @@ export class Pandoc {
             args.push("--reference-links");
         if (options.referenceLocation)
             args.push("--reference-location", options.referenceLocation);
+        // Extract media
+        if (options.extractMedia)
+            args.push("--extract-media", options.extractMedia);
         // Other options
         if (options.failIfWarnings)
             args.push("--fail-if-warnings");

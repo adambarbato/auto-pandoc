@@ -26,7 +26,7 @@ export { Pandoc, default as PandocClass } from "./pandoc.js";
 // Utility functions
 export { 
 // Format conversion utilities
-markdownToHtml, markdownToPdf, htmlToMarkdown, latexToHtml, docxToMarkdown, markdownToDocx, markdownToEpub, convertFormat, convertFileFormat, 
+markdownToHtml, markdownToPdf, htmlToMarkdown, latexToHtml, docxToMarkdown, markdownToDocx, markdownToEpub, epubToMarkdown, epubToHtml, convertFormat, convertFileFormat, 
 // Format support checking
 getSupportedFormats, isInputFormatSupported, isOutputFormatSupported, 
 // Document utilities

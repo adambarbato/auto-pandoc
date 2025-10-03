@@ -127,6 +127,85 @@ const result = await Pandoc.convert(markdown, {
 });
 ```
 
+## EPUB Extraction
+
+The library includes specialized functions for extracting and converting EPUB files, with support for automatic media extraction.
+
+### Basic EPUB Conversion
+
+```typescript
+import { epubToMarkdown, epubToHtml } from 'auto-pandoc';
+
+// Convert EPUB to Markdown
+const mdResult = await epubToMarkdown('book.epub', 'output.md');
+
+// Convert EPUB to HTML
+const htmlResult = await epubToHtml('book.epub', 'output.html');
+```
+
+### EPUB with Media Extraction
+
+When converting EPUB files, you can use the `extractMedia` option to automatically extract images, fonts, and other media files to a directory:
+
+```typescript
+import { epubToMarkdown, epubToHtml } from 'auto-pandoc';
+
+// Extract EPUB to Markdown with media
+const result = await epubToMarkdown('book.epub', 'output.md', {
+  extractMedia: './book-media',  // Images and media extracted here
+  standalone: true
+});
+
+// Extract EPUB to HTML with media in separate directory
+const htmlResult = await epubToHtml('book.epub', 'output.html', {
+  extractMedia: './html-media',
+  standalone: true,
+  selfContained: false  // Keep media as separate files
+});
+```
+
+### Self-Contained EPUB Conversion
+
+For a single-file output with all media embedded:
+
+```typescript
+import { epubToHtml } from 'auto-pandoc';
+
+// Create self-contained HTML with embedded media
+const result = await epubToHtml('book.epub', 'standalone.html', {
+  standalone: true,
+  selfContained: true  // Embeds all media in the HTML file
+});
+```
+
+### Advanced EPUB Options
+
+```typescript
+import { epubToMarkdown } from 'auto-pandoc';
+
+// Convert EPUB with table of contents and metadata
+const result = await epubToMarkdown('book.epub', 'book.md', {
+  extractMedia: './book-assets',
+  standalone: true,
+  toc: true,
+  tocDepth: 3,
+  numberSections: true,
+  metadata: {
+    title: 'Extracted Book',
+    author: 'Original Author',
+    date: new Date().toISOString().split('T')[0]
+  }
+});
+```
+
+### Running the Example
+
+Try the included example script:
+
+```bash
+node examples/epub-extraction.js path/to/your/book.epub
+```
+
 ## API Reference
 
 ### Main Class: `Pandoc`
@@ -177,13 +256,24 @@ import {
   htmlToMarkdown,
   markdownToDocx,
   docxToMarkdown,
-  markdownToEpub
+  markdownToEpub,
+  epubToMarkdown,
+  epubToHtml
 } from 'auto-pandoc';
 
 // Quick conversions
 const htmlResult = await markdownToHtml('# Title');
 const pdfResult = await markdownToPdf('# Title', { pdfEngine: 'xelatex' });
 const mdResult = await htmlToMarkdown('<h1>Title</h1>');
+
+// EPUB extraction with media
+const epubMdResult = await epubToMarkdown('book.epub', 'output.md', {
+  extractMedia: './media'  // Extract images and media to this directory
+});
+const epubHtmlResult = await epubToHtml('book.epub', 'output.html', {
+  extractMedia: './media',
+  standalone: true
+});
 ```
 
 ### Quick Access Functions

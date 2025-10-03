@@ -23,7 +23,7 @@
  */
 export { Pandoc, default as PandocClass } from "./pandoc.js";
 export type { PandocFormat, CitationStyle, HighlightStyle, PandocOptions, PandocResult, PandocBinary, InstallOptions, ExecOptions, } from "./types.js";
-export { markdownToHtml, markdownToPdf, htmlToMarkdown, latexToHtml, docxToMarkdown, markdownToDocx, markdownToEpub, convertFormat, convertFileFormat, getSupportedFormats, isInputFormatSupported, isOutputFormatSupported, createStandaloneHtml, markdownToPresentation, extractMetadata, validateMarkdown, getWordCount, convertBibliography, csvToMarkdownTable, presets, } from "./utils.js";
+export { markdownToHtml, markdownToPdf, htmlToMarkdown, latexToHtml, docxToMarkdown, markdownToDocx, markdownToEpub, epubToMarkdown, epubToHtml, convertFormat, convertFileFormat, getSupportedFormats, isInputFormatSupported, isOutputFormatSupported, createStandaloneHtml, markdownToPresentation, extractMetadata, validateMarkdown, getWordCount, convertBibliography, csvToMarkdownTable, presets, } from "./utils.js";
 export { Pandoc as default } from "./pandoc.js";
 /**
  * Quick start functions for common conversions

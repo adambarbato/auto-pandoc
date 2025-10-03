@@ -86,6 +86,8 @@ export interface PandocOptions {
     referenceLinks?: boolean;
     /** Reference location */
     referenceLocation?: "block" | "section" | "document";
+    /** Extract media to directory */
+    extractMedia?: string;
     /** Markdown extensions */
     extensions?: string[];
     /** Fail if warnings */
@@ -175,6 +177,6 @@ export interface ExecOptions {
     /** Input to pipe to pandoc */
     input?: string;
     /** Encoding for input/output */
-    encoding?: string;
+    encoding?: BufferEncoding;
 }
 //# sourceMappingURL=types.d.ts.map

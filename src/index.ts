@@ -47,6 +47,8 @@ export {
   docxToMarkdown,
   markdownToDocx,
   markdownToEpub,
+  epubToMarkdown,
+  epubToHtml,
   convertFormat,
   convertFileFormat,
 

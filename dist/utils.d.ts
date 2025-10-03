@@ -36,6 +36,14 @@ export declare function markdownToDocx(inputPath: string, outputPath?: string, o
  */
 export declare function markdownToEpub(inputPath: string, outputPath?: string, options?: Omit<PandocOptions, "from" | "to">): Promise<PandocResult>;
 /**
+ * Convenience function to convert EPUB to markdown
+ */
+export declare function epubToMarkdown(inputPath: string, outputPath?: string, options?: Omit<PandocOptions, "from" | "to">): Promise<PandocResult>;
+/**
+ * Convenience function to convert EPUB to HTML
+ */
+export declare function epubToHtml(inputPath: string, outputPath?: string, options?: Omit<PandocOptions, "from" | "to">): Promise<PandocResult>;
+/**
  * Convenience function to convert any format to any format
  */
 export declare function convertFormat(input: string, from: PandocFormat, to: PandocFormat, options?: Omit<PandocOptions, "from" | "to">): Promise<PandocResult>;

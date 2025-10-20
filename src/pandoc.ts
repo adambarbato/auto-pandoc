@@ -65,7 +65,7 @@ export class Pandoc {
         try {
           const result = await this.execPandoc(
             ["--version"],
-            { timeout: 5000 },
+            { timeout: 50000 },
             path,
           );
           if (result.success) {
@@ -146,7 +146,7 @@ export class Pandoc {
         args,
         {
           input,
-          timeout: options.verbose ? 60000 : 30000,
+          timeout: options.verbose ? 600000 : 300000,
         },
         binaryPath,
       );
@@ -193,7 +193,7 @@ export class Pandoc {
     // If extractMedia is specified and outputPath is provided,
     // set CWD to the output directory so extractMedia paths are relative to the output
     let execOptions: ExecOptions = {
-      timeout: options.verbose ? 60000 : 30000,
+      timeout: options.verbose ? 600000 : 300000,
     };
 
     if (options.extractMedia && outputPath) {
